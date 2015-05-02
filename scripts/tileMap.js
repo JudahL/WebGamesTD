@@ -127,4 +127,4 @@ TileMap.prototype.placeTower = function () {
 };
 
 var tileLandscapes = ['0', 'v', 'h', 'lu', 'ld', 'ru', 'rd'];
-var tileTowers = ['t1'];
+var tileTowers = ['t1', '', '', '', '', '', 'c1', 'c2'];

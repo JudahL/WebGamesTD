@@ -10,13 +10,13 @@ stateManager.menu = function (game) {
         [0, 0, 0, 0]
     ];
     this.towerMap = [
-        [0, 0, 0, 1],
         [0, 0, 0, 0],
         [0, 0, 0, 0],
-        [0, 0, 0, 1]
+        [0, 7, 0, 0],
+        [0, 0, 0, 8]
     ];
+    this.town;
 };
-
 
 stateManager.menu.prototype = {
     init: function () {
@@ -36,13 +36,10 @@ stateManager.menu.prototype = {
         
         this.setUpTitle();
         
-        game.input.onDown.add(function () {
-            game.state.getCurrentState().map.place = true;
-        });
+        game.input.addMoveCallback(this.checkTown, this);
         
-        game.input.onUp.add(function () {
-            game.state.getCurrentState().map.place = false;
-        });
+        
+        game.input.onDown.add(this.loadLevel, this);
     },
     
     setUpTitle: function () {
@@ -59,5 +56,29 @@ stateManager.menu.prototype = {
     
     update: function () {
         this.map.update();
+    },
+    
+    checkTown: function () {
+        if (this.map.currentTile.tower){
+            this.town = this.map.currentTile.tower.key;
+        } else {
+            this.town = null;
+        }
+    },
+    
+    loadLevel: function () {
+        switch (this.town) {
+            case 'c1':
+                game.state.start('level1');
+                break;
+                
+            case 'c2':
+                
+                break;
+                
+            default:
+                break;
+        }
     }
+        
 };

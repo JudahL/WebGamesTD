@@ -30,6 +30,8 @@ stateManager.loading.prototype = {
         this.load.image('ru', 'images/landscape_39.png');
         this.load.image('rd', 'images/landscape_34.png');
         this.load.image('t1', 'images/tower1.png');
+        this.load.image('c1', 'images/city1.png');
+        this.load.image('c2', 'images/city2.png');
     },
 
     create: function () {

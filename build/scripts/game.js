@@ -78,6 +78,69 @@ stateManager.boot.prototype = {
     }
 };
 
+stateManager.levelOne = function (game) { 
+    this.titleText = null;
+    this.titleBG = null;
+    this.titleY = 96;
+    this.map = null;
+    this.tileMap = [
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0]
+    ];
+    this.towerMap = [
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0]
+    ];
+};
+
+stateManager.levelOne.prototype = {
+    create: function () { 
+        game.input.deleteMoveCallback(0);
+        
+        this.map = new TileMap(71.5, 0);
+        this.map.initiate(this.tileMap, this.towerMap);
+        this.map.spawnTiles(this.map.towerMap, 64, true);
+        
+        this.setUpTitle();
+        
+        game.input.onDown.add(function () {
+            this.map.place = true;
+        }, this);
+        
+        game.input.onUp.add(function () {
+            this.map.place = false;
+        }, this);
+    },
+    
+    setUpTitle: function () {
+        this.titleBG = this.add.sprite(this.world.centerX, this.titleY, 'menuAtlas', 'panelInset_beige.png');
+        this.titleBG.anchor.set(0.5, 0.5);
+        this.titleBG.scale.setTo(3 , 0.7);
+        
+        this.titleText = this.add.text(this.world.centerX, this.titleY, 'Level 1', { 
+            font: "30px Orbitron", 
+            fill: "#343434", 
+            align: "center" });
+        this.titleText.anchor.set(0.5, 0.5);
+    },
+    
+    update: function () {
+        this.map.update();
+    },
+    
+    loadLevel: function () {
+        
+    }
+        
+};
 stateManager.loading = function (game) { 
     this.preloadBar = null;
     this.loadText = null;
@@ -110,6 +173,8 @@ stateManager.loading.prototype = {
         this.load.image('ru', 'images/landscape_39.png');
         this.load.image('rd', 'images/landscape_34.png');
         this.load.image('t1', 'images/tower1.png');
+        this.load.image('c1', 'images/city1.png');
+        this.load.image('c2', 'images/city2.png');
     },
 
     create: function () {
@@ -135,13 +200,13 @@ stateManager.menu = function (game) {
         [0, 0, 0, 0]
     ];
     this.towerMap = [
-        [0, 0, 0, 1],
         [0, 0, 0, 0],
         [0, 0, 0, 0],
-        [0, 0, 0, 1]
+        [0, 7, 0, 0],
+        [0, 0, 0, 8]
     ];
+    this.town;
 };
-
 
 stateManager.menu.prototype = {
     init: function () {
@@ -161,13 +226,10 @@ stateManager.menu.prototype = {
         
         this.setUpTitle();
         
-        game.input.onDown.add(function () {
-            game.state.getCurrentState().map.place = true;
-        });
+        game.input.addMoveCallback(this.checkTown, this);
         
-        game.input.onUp.add(function () {
-            game.state.getCurrentState().map.place = false;
-        });
+        
+        game.input.onDown.add(this.loadLevel, this);
     },
     
     setUpTitle: function () {
@@ -184,7 +246,31 @@ stateManager.menu.prototype = {
     
     update: function () {
         this.map.update();
+    },
+    
+    checkTown: function () {
+        if (this.map.currentTile.tower){
+            this.town = this.map.currentTile.tower.key;
+        } else {
+            this.town = null;
+        }
+    },
+    
+    loadLevel: function () {
+        switch (this.town) {
+            case 'c1':
+                game.state.start('level1');
+                break;
+                
+            case 'c2':
+                
+                break;
+                
+            default:
+                break;
+        }
     }
+        
 };
 function TileMap (size) {
     this.tileMap = [];
@@ -315,13 +401,13 @@ TileMap.prototype.placeTower = function () {
 };
 
 var tileLandscapes = ['0', 'v', 'h', 'lu', 'ld', 'ru', 'rd'];
-var tileTowers = ['t1'];
+var tileTowers = ['t1', '', '', '', '', '', 'c1', 'c2'];
 var game = new Phaser.Game(800, 600, Phaser.AUTO, 'test', null, true, false);
 
 game.state.add('boot', stateManager.boot);
 game.state.add('loading', stateManager.loading);
 game.state.add('menu', stateManager.menu);
-//game.state.add('level1', stateManager.level1);
+game.state.add('level1', stateManager.levelOne);
 //game.state.add('scoreScreen', stateManager.scoreScreen);
 
 game.state.start('boot');
