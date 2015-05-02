@@ -4,10 +4,16 @@ stateManager.menu = function (game) {
     this.titleY = 96;
     this.map = null;
     this.tileMap = [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
+    ];
+    this.towerMap = [
         [0, 0, 0, 1],
-        [0, 1, 0, 0],
-        [0, 0, 3, 0],
-        [0, 2, 0, 0]
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 1]
     ];
 };
 
@@ -24,7 +30,8 @@ stateManager.menu.prototype = {
         game.cursorPos = new Phaser.Plugin.Isometric.Point3();
         
         this.map = new TileMap(71.5, 0);
-        this.map.initiate(this.tileMap);
+        this.map.initiate(this.tileMap, this.towerMap);
+        this.map.spawnTiles(this.map.towerMap, 64, true);
         
         this.setUpTitle();
     },

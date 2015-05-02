@@ -29,6 +29,7 @@ stateManager.loading.prototype = {
         this.load.image('ld', 'images/landscape_31.png');
         this.load.image('ru', 'images/landscape_39.png');
         this.load.image('rd', 'images/landscape_34.png');
+        this.load.image('t1', 'images/tower1.png');
     },
 
     create: function () {
