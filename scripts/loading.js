@@ -29,9 +29,11 @@ stateManager.loading.prototype = {
         this.load.image('ld', 'images/landscape_31.png');
         this.load.image('ru', 'images/landscape_39.png');
         this.load.image('rd', 'images/landscape_34.png');
-        this.load.image('t1', 'images/tower1.png');
-        this.load.image('c1', 'images/city1.png');
-        this.load.image('c2', 'images/city2.png');
+        this.load.image('3d', 'images/landscape_06.png');
+        this.load.image('3l', 'images/landscape_10.png');
+        this.load.image('3r', 'images/landscape_11.png');
+        this.load.image('3u', 'images/landscape_14.png');
+        this.load.atlasJSONHash('towerAtlas', 'images/towerAtlas.png', 'images/towerAtlas.json');
     },
 
     create: function () {

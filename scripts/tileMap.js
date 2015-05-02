@@ -14,6 +14,7 @@ function TileMap (size) {
         
     };
     this.place = false;
+    this.canPlace = true;
 }
 
 TileMap.prototype.initiate = function (map, tMap) {
@@ -32,7 +33,7 @@ TileMap.prototype.spawnTiles = function (tm, zz, tower) {
                 tile = game.add.isoSprite(xx, yy, zz, tileLandscapes[tm[yy/this.size][xx/this.size]], 0, this.tileGroup);
             } else {
                 if (tm[yy/this.size][xx/this.size] != 0) {
-                    tile = game.add.isoSprite(xx, yy, zz, tileTowers[tm[yy/this.size][xx/this.size]-1], 0, this.towerGroup);
+                    tile = game.add.isoSprite(xx, yy, zz, 'towerAtlas', tileTowers[tm[yy/this.size][xx/this.size]-1], this.towerGroup);
                 }
             }
             if (tile) {
@@ -52,7 +53,7 @@ TileMap.prototype.update = function () {
     
     this.tileGroup.forEach(this.checkTileForCursor, this);
     
-    if (this.place) { this.placeTower(); }
+    if (this.place) { this.placeTower(tileTowers[game.state.getCurrentState().currentTowerIndex]); }
 };
 
 TileMap.prototype.checkTileForCursor = function (tile) {
@@ -74,9 +75,11 @@ TileMap.prototype.selectTile = function (tile) {
     this.towerGroup.forEach(this.checkForTower, this, false, tile);
 
     if (tile.key == '0') {
+        this.canPlace = true;
         tile.tint = 0x86bfda;
     } else {
-        tile.tint = 0xDB4D4D;
+        this.canPlace = false;
+        tile.tint = 0xBB4D4D;
     }
 };
 
@@ -113,11 +116,11 @@ TileMap.prototype.tweenDownTower = function (tileT, tile){
     }
 };
 
-TileMap.prototype.placeTower = function () {
-    if (this.currentTile.tile && !this.currentTile.tower) {
+TileMap.prototype.placeTower = function (towerType) {
+    if (this.currentTile.tile && !this.currentTile.tower && this.canPlace) {
         var xx = this.currentTile.tile.isoPosition.x;
         var yy = this.currentTile.tile.isoPosition.y;
-        var tower = game.add.isoSprite(xx, yy, 64, 't1', 0, this.towerGroup);
+        var tower = game.add.isoSprite(xx, yy, 64, 'towerAtlas', towerType, this.towerGroup);
         tower.anchor.set(0.5, 0);
         game.iso.simpleSort(this.towerGroup);
         game.add.tween(tower).to({ isoZ: 72 }, 200, Phaser.Easing.Quadratic.InOut, true);
@@ -125,6 +128,3 @@ TileMap.prototype.placeTower = function () {
         this.place = false;
     }
 };
-
-var tileLandscapes = ['0', 'v', 'h', 'lu', 'ld', 'ru', 'rd'];
-var tileTowers = ['t1', '', '', '', '', '', 'c1', 'c2'];

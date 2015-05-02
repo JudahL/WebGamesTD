@@ -84,11 +84,11 @@ stateManager.levelOne = function (game) {
     this.titleY = 96;
     this.map = null;
     this.tileMap = [
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0],
+        [0, 7, 2, 3, 0, 0],
+        [2, 8, 0, 1, 0, 0],
+        [0, 6, 2, 9, 2, 2],
         [0, 0, 0, 0, 0, 0]
     ];
     this.towerMap = [
@@ -99,6 +99,9 @@ stateManager.levelOne = function (game) {
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0]
     ];
+    this.currentTowerIndex = 0;
+    this.currentTowerImage;
+    this.maxTowers = 3;
 };
 
 stateManager.levelOne.prototype = {
@@ -111,13 +114,21 @@ stateManager.levelOne.prototype = {
         
         this.setUpTitle();
         
-        game.input.onDown.add(function () {
+        game.input.onDown.add(function (e) {
+            console.log(e);
             this.map.place = true;
         }, this);
         
         game.input.onUp.add(function () {
             this.map.place = false;
         }, this);
+        
+        this.currentTowerImage = game.add.image(this.world.centerX+300, this.world.centerY-150, 'towerAtlas', 'tower1.png');
+        this.currentTowerImage.anchor.set(0.5, 0.5);
+        
+        this.currentTowerImage.inputEnabled = true;
+        this.currentTowerImage.input.useHandCursor = true;
+        this.currentTowerImage.events.onInputDown.add(this.switchTower, this);
     },
     
     setUpTitle: function () {
@@ -138,6 +149,12 @@ stateManager.levelOne.prototype = {
     
     loadLevel: function () {
         
+    },
+    
+    switchTower: function () {
+        this.currentTowerIndex++;
+        this.currentTowerIndex %= 3;
+        this.currentTowerImage.frameName = tileTowers[this.currentTowerIndex];
     }
         
 };
@@ -172,9 +189,11 @@ stateManager.loading.prototype = {
         this.load.image('ld', 'images/landscape_31.png');
         this.load.image('ru', 'images/landscape_39.png');
         this.load.image('rd', 'images/landscape_34.png');
-        this.load.image('t1', 'images/tower1.png');
-        this.load.image('c1', 'images/city1.png');
-        this.load.image('c2', 'images/city2.png');
+        this.load.image('3d', 'images/landscape_06.png');
+        this.load.image('3l', 'images/landscape_10.png');
+        this.load.image('3r', 'images/landscape_11.png');
+        this.load.image('3u', 'images/landscape_14.png');
+        this.load.atlasJSONHash('towerAtlas', 'images/towerAtlas.png', 'images/towerAtlas.json');
     },
 
     create: function () {
@@ -250,7 +269,7 @@ stateManager.menu.prototype = {
     
     checkTown: function () {
         if (this.map.currentTile.tower){
-            this.town = this.map.currentTile.tower.key;
+            this.town = this.map.currentTile.tower.frameName;
         } else {
             this.town = null;
         }
@@ -258,11 +277,11 @@ stateManager.menu.prototype = {
     
     loadLevel: function () {
         switch (this.town) {
-            case 'c1':
+            case 'city1.png':
                 game.state.start('level1');
                 break;
                 
-            case 'c2':
+            case 'city2.png':
                 
                 break;
                 
@@ -272,6 +291,15 @@ stateManager.menu.prototype = {
     }
         
 };
+var tileLandscapes = ['0', 'v', 'h', 'lu', 'ld', 'ru', 'rd', '3d', '3u', '3r', '3l'];
+var tileTowers = ['tower1.png', //1
+                  'tower2.png', //2
+                  'tower3.png', //3
+                  '', //4
+                  '', //5
+                  '', //6
+                  'city1.png', //7
+                  'city2.png'];//8
 function TileMap (size) {
     this.tileMap = [];
     this.towerMap = [];
@@ -288,6 +316,7 @@ function TileMap (size) {
         
     };
     this.place = false;
+    this.canPlace = true;
 }
 
 TileMap.prototype.initiate = function (map, tMap) {
@@ -306,7 +335,7 @@ TileMap.prototype.spawnTiles = function (tm, zz, tower) {
                 tile = game.add.isoSprite(xx, yy, zz, tileLandscapes[tm[yy/this.size][xx/this.size]], 0, this.tileGroup);
             } else {
                 if (tm[yy/this.size][xx/this.size] != 0) {
-                    tile = game.add.isoSprite(xx, yy, zz, tileTowers[tm[yy/this.size][xx/this.size]-1], 0, this.towerGroup);
+                    tile = game.add.isoSprite(xx, yy, zz, 'towerAtlas', tileTowers[tm[yy/this.size][xx/this.size]-1], this.towerGroup);
                 }
             }
             if (tile) {
@@ -326,7 +355,7 @@ TileMap.prototype.update = function () {
     
     this.tileGroup.forEach(this.checkTileForCursor, this);
     
-    if (this.place) { this.placeTower(); }
+    if (this.place) { this.placeTower(tileTowers[game.state.getCurrentState().currentTowerIndex]); }
 };
 
 TileMap.prototype.checkTileForCursor = function (tile) {
@@ -348,9 +377,11 @@ TileMap.prototype.selectTile = function (tile) {
     this.towerGroup.forEach(this.checkForTower, this, false, tile);
 
     if (tile.key == '0') {
+        this.canPlace = true;
         tile.tint = 0x86bfda;
     } else {
-        tile.tint = 0xDB4D4D;
+        this.canPlace = false;
+        tile.tint = 0xBB4D4D;
     }
 };
 
@@ -387,11 +418,11 @@ TileMap.prototype.tweenDownTower = function (tileT, tile){
     }
 };
 
-TileMap.prototype.placeTower = function () {
-    if (this.currentTile.tile && !this.currentTile.tower) {
+TileMap.prototype.placeTower = function (towerType) {
+    if (this.currentTile.tile && !this.currentTile.tower && this.canPlace) {
         var xx = this.currentTile.tile.isoPosition.x;
         var yy = this.currentTile.tile.isoPosition.y;
-        var tower = game.add.isoSprite(xx, yy, 64, 't1', 0, this.towerGroup);
+        var tower = game.add.isoSprite(xx, yy, 64, 'towerAtlas', towerType, this.towerGroup);
         tower.anchor.set(0.5, 0);
         game.iso.simpleSort(this.towerGroup);
         game.add.tween(tower).to({ isoZ: 72 }, 200, Phaser.Easing.Quadratic.InOut, true);
@@ -399,9 +430,6 @@ TileMap.prototype.placeTower = function () {
         this.place = false;
     }
 };
-
-var tileLandscapes = ['0', 'v', 'h', 'lu', 'ld', 'ru', 'rd'];
-var tileTowers = ['t1', '', '', '', '', '', 'c1', 'c2'];
 var game = new Phaser.Game(800, 600, Phaser.AUTO, 'test', null, true, false);
 
 game.state.add('boot', stateManager.boot);

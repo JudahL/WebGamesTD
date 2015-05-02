@@ -60,7 +60,7 @@ stateManager.menu.prototype = {
     
     checkTown: function () {
         if (this.map.currentTile.tower){
-            this.town = this.map.currentTile.tower.key;
+            this.town = this.map.currentTile.tower.frameName;
         } else {
             this.town = null;
         }
@@ -68,11 +68,11 @@ stateManager.menu.prototype = {
     
     loadLevel: function () {
         switch (this.town) {
-            case 'c1':
+            case 'city1.png':
                 game.state.start('level1');
                 break;
                 
-            case 'c2':
+            case 'city2.png':
                 
                 break;
                 

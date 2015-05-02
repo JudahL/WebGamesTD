@@ -1,0 +1,52 @@
+{"frames": {
+
+"city1.png":
+{
+	"frame": {"x":270,"y":2,"w":90,"h":105},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":15,"w":90,"h":105},
+	"sourceSize": {"w":90,"h":120}
+},
+"city2.png":
+{
+	"frame": {"x":362,"y":2,"w":90,"h":93},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":27,"w":90,"h":93},
+	"sourceSize": {"w":90,"h":120}
+},
+"tower1.png":
+{
+	"frame": {"x":2,"y":2,"w":89,"h":116},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":1,"y":4,"w":89,"h":116},
+	"sourceSize": {"w":90,"h":120}
+},
+"tower2.png":
+{
+	"frame": {"x":93,"y":2,"w":89,"h":113},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":1,"y":7,"w":89,"h":113},
+	"sourceSize": {"w":90,"h":120}
+},
+"tower3.png":
+{
+	"frame": {"x":184,"y":2,"w":84,"h":111},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":9,"w":84,"h":111},
+	"sourceSize": {"w":90,"h":120}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "towerAtlas.png",
+	"format": "RGBA8888",
+	"size": {"w":454,"h":120},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:f2514b7058235bf04a557fc14a1fadec:5c6a66c03c274490114921572426d514:33c40abc4def1f7451a64d145795c671$"
+}
+}
