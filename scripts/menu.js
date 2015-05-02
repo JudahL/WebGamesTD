@@ -37,7 +37,11 @@ stateManager.menu.prototype = {
         this.setUpTitle();
         
         game.input.onDown.add(function () {
-            game.state.getCurrentState().map.placeTower();
+            game.state.getCurrentState().map.place = true;
+        });
+        
+        game.input.onUp.add(function () {
+            game.state.getCurrentState().map.place = false;
         });
     },
     
