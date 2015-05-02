@@ -1,0 +1,52 @@
+{"frames": {
+
+"buttonLong_beige.png":
+{
+	"frame": {"x":2,"y":2,"w":190,"h":49},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":190,"h":49},
+	"sourceSize": {"w":190,"h":49}
+},
+"buttonLong_beige_pressed.png":
+{
+	"frame": {"x":2,"y":53,"w":190,"h":45},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":190,"h":45},
+	"sourceSize": {"w":190,"h":45}
+},
+"buttonLong_blue_pressed.png":
+{
+	"frame": {"x":2,"y":100,"w":190,"h":45},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":190,"h":45},
+	"sourceSize": {"w":190,"h":45}
+},
+"panelInset_beige.png":
+{
+	"frame": {"x":104,"y":147,"w":93,"h":94},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":93,"h":94},
+	"sourceSize": {"w":93,"h":94}
+},
+"panel_beige.png":
+{
+	"frame": {"x":2,"y":147,"w":100,"h":100},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":100,"h":100},
+	"sourceSize": {"w":100,"h":100}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "menuAtlas.png",
+	"format": "RGBA8888",
+	"size": {"w":199,"h":249},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:0e9ea0e4235bef94f4ac7200e017b78e:f251cd82591a36142235179cf64c174c:e40542be9d87bb8871fafdf5d1300b85$"
+}
+}
