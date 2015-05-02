@@ -17,16 +17,17 @@ stateManager.menu = function (game) {
     ];
 };
 
+
 stateManager.menu.prototype = {
     init: function () {
 
     },
 
     preload: function () {
-    
+        
     },
 
-    create: function () {        
+    create: function () {  
         game.cursorPos = new Phaser.Plugin.Isometric.Point3();
         
         this.map = new TileMap(71.5, 0);
@@ -34,6 +35,10 @@ stateManager.menu.prototype = {
         this.map.spawnTiles(this.map.towerMap, 64, true);
         
         this.setUpTitle();
+        
+        game.input.onDown.add(function () {
+            game.state.getCurrentState().map.placeTower();
+        });
     },
     
     setUpTitle: function () {
