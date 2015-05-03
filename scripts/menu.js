@@ -1,7 +1,10 @@
 stateManager.menu = function (game) { 
     this.menuTitleText = null;
     this.menuTitleBG = null;
+    this.levelTitleText = null;
+    this.levelTitleBG = null;
     this.titleY = 96;
+    this.levelUIY = 450;
     this.map = null;
     this.tileMap = [
         [0, 0, 0, 0],
@@ -35,23 +38,36 @@ stateManager.menu.prototype = {
         this.map.spawnTiles(this.map.towerMap, 64, true);
         
         this.setUpTitle();
+        this.setUpLevelUI();
+        
         
         game.input.addMoveCallback(this.checkTown, this);
-        
         
         game.input.onDown.add(this.loadLevel, this);
     },
     
     setUpTitle: function () {
-        this.menuTitleBG = this.add.sprite(this.world.centerX, this.titleY, 'menuAtlas', 'panelInset_beige.png');
+        this.menuTitleBG = this.add.sprite(this.world.centerX, this.titleY, 'menuAtlas', 'buttonLong_beige.png');
         this.menuTitleBG.anchor.set(0.5, 0.5);
-        this.menuTitleBG.scale.setTo(3 , 0.7);
+        this.menuTitleBG.scale.setTo(1.6 , 1.3);
         
         this.menuTitleText = this.add.text(this.world.centerX, this.titleY, 'Tower Defence', { 
             font: "30px Orbitron", 
             fill: "#343434", 
             align: "center" });
         this.menuTitleText.anchor.set(0.5, 0.5);
+    },
+    
+    setUpLevelUI: function () {
+        this.levelTitleBG = this.add.sprite(this.world.centerX, this.levelUIY, 'menuAtlas', 'buttonLong_beige_pressed.png');
+        this.levelTitleBG.anchor.set(0.5, 0.5);
+        this.levelTitleBG.scale.setTo(1 , 1);
+        
+        this.levelTitleText = this.add.text(this.world.centerX,  this.levelUIY, 'Menu', { 
+            font: "30px Orbitron", 
+            fill: "#343434", 
+            align: "center" });
+        this.levelTitleText.anchor.set(0.5, 0.5);
     },
     
     update: function () {
@@ -61,8 +77,21 @@ stateManager.menu.prototype = {
     checkTown: function () {
         if (this.map.currentTile.tower){
             this.town = this.map.currentTile.tower.frameName;
+            switch (this.town) {
+                case 'city1.png':
+                     this.levelTitleText.text = 'Level 1';
+                    break;
+                    
+                case 'city2.png':
+                     this.levelTitleText.text = 'Level 2';
+                    break;
+                    
+                default:
+                    break;
+            }
         } else {
             this.town = null;
+            this.levelTitleText.text = 'Menu';
         }
     },
     
@@ -73,7 +102,7 @@ stateManager.menu.prototype = {
                 break;
                 
             case 'city2.png':
-                
+                game.state.start('level2');
                 break;
                 
             default:

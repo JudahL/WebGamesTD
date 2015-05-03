@@ -1,23 +1,25 @@
-stateManager.levelOne = function (game) { 
+stateManager.levelTwo = function (game) { 
     this.titleText = null;
     this.titleBG = null;
-    this.titleY = 550;
+    this.titleY = 600;
     this.map = null;
     this.tileMap = [
-        [ 0, 1, 0,11, 0,15],
-        [ 0, 1, 0, 0, 0, 0],
-        [14, 7, 2, 3, 0,13],
-        [ 2, 8, 0, 1, 0, 0],
-        [ 0, 6, 2, 9, 2, 2],
-        [ 0,16, 0, 0, 0,12]
+        [14,18, 0,14, 0, 1,16],
+        [17,22, 0, 0, 0, 1, 0],
+        [ 0, 4, 2, 2, 2, 5,20],
+        [ 2, 8,12, 0, 0, 0,18],
+        [13, 6, 2, 2, 2, 3,18],
+        [ 0,15, 0, 0,11, 1,21],
+        [ 0, 0, 0, 0, 0, 1, 0]
     ];
     this.towerMap = [
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0]
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0]
     ];
     this.currentTowerIndex = 0;
     this.currentTowerImage;
@@ -29,7 +31,7 @@ stateManager.levelOne = function (game) {
     };
 };
 
-stateManager.levelOne.prototype = {
+stateManager.levelTwo.prototype = {
     create: function () { 
         game.input.deleteMoveCallback(0);
         
@@ -69,7 +71,7 @@ stateManager.levelOne.prototype = {
         this.titleBG.anchor.set(0.5, 0.5);
         this.titleBG.scale.setTo(1.2 , 1.2);
         
-        this.titleText = this.add.text(this.world.centerX, this.titleY, 'Level 1', { 
+        this.titleText = this.add.text(this.world.centerX, this.titleY, 'Level 2', { 
             font: "30px Orbitron", 
             fill: "#343434", 
             align: "center" });

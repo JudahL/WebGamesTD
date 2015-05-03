@@ -22,17 +22,7 @@ stateManager.loading.prototype = {
         
         //this.load.atlasJSONHash('gameAtlas', 'images/gameAtlas');
         //this.load.audio('music', ['audio/soundtrack.mp3']);
-        this.load.image('0', 'images/landscape_28.png');
-        this.load.image('h', 'images/landscape_32.png');
-        this.load.image('v', 'images/landscape_29.png');
-        this.load.image('lu', 'images/landscape_35.png');
-        this.load.image('ld', 'images/landscape_31.png');
-        this.load.image('ru', 'images/landscape_39.png');
-        this.load.image('rd', 'images/landscape_34.png');
-        this.load.image('3d', 'images/landscape_06.png');
-        this.load.image('3l', 'images/landscape_10.png');
-        this.load.image('3r', 'images/landscape_11.png');
-        this.load.image('3u', 'images/landscape_14.png');
+        this.load.atlasJSONHash('landAtlas', 'images/landAtlas.png', 'images/landAtlas.json');
         this.load.atlasJSONHash('towerAtlas', 'images/towerAtlas.png', 'images/towerAtlas.json');
     },
 
