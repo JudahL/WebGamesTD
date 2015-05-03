@@ -55,6 +55,194 @@ var inputManager = {
        
     }
 }
+function AStarMap () {
+    this.data = null;
+}
+
+AStarMap.prototype.initiate = function (data) {
+    this.data = data;
+};
+
+AStarMap.prototype.outOfBounds = function (x, y) {
+    return x < 0 || x >= this.data.length || y < 0 || y >= this.data.length;
+};
+
+AStarMap.prototype.blocked = function (x, y) {
+    if (this.outOfBounds(x,y)) { return true; }
+    if (this.data[y][x] === 0){ return true; }
+    
+    return false;
+};
+
+AStarMap.prototype.getNeighbors = function (x, y) {
+    var neighbors = [];
+    
+    if (!this.blocked(x, y - 1)) { neighbors.push(new TileVector(x, y - 1)) }
+    if (!this.blocked(x + 1, y)) { neighbors.push(new TileVector(x + 1, y)) }
+    if (!this.blocked(x, y + 1)) { neighbors.push(new TileVector(x, y + 1)) }
+    if (!this.blocked(x - 1, y)) { neighbors.push(new TileVector(x - 1, y)) }
+        
+    return neighbors;
+};
+
+AStarMap.prototype.getCost = function (x, y) {
+    return this.data[y][x];
+};
+
+function TileVector (x, y) {
+    this.x = x;
+    this.y = y;
+}
+function Node (xC, yC, xT, yT, totalSteps, parentNode) {
+    this.x = xC;
+    this.y = yC;
+    this.g = totalSteps;
+    this.h = this.manhattanDistance(xC, yC, xT, yT);
+    this.f = totalSteps + this.manhattanDistance(xC, yC, xT, yT);
+    this.parent = parentNode;
+}
+
+Node.prototype.manhattanDistance = function (xC, yC, xT, yT) {
+    var dx = Math.abs(xT - xC), 
+        dy = Math.abs(yT - yC);
+    return dx + dy;
+};
+function AStarPathfinder () {
+    this.map = null;
+    this.closed = null;
+    this.open = null;
+    this.history = null;
+    this.step = 0;
+}
+
+AStarPathfinder.prototype.initiate = function (map) {
+    this.closed = [];
+    this.open = [];
+    this.history = [];
+    this.map = map;
+};
+
+AStarPathfinder.prototype.addClosed = function (step) {
+   // this.addHistory(step, 'closed');
+    this.closed.push(step);
+    return this;
+};
+
+AStarPathfinder.prototype.inClosed = function (step) {
+    for (var i = 0; i < this.closed.length; i++) {
+        if (this.closed[i].x === step.x 
+            && this.closed[i].y === step.y) {
+                return this.closed[i];
+        }
+    }
+    
+    return false;
+};
+
+AStarPathfinder.prototype.addOpen = function (step) {
+    this.open.push(step);
+    return this;
+};
+
+AStarPathfinder.prototype.removeOpen = function (step) {
+    for (var i = 0; i < this.open.length; i++) {
+        if (this.open[i] === step) { this.open.splice(i, 1); }
+    }
+    
+    return this;
+};
+
+AStarPathfinder.prototype.inOpen = function (step) {
+    for (var i = 0; i < this.open.length; i++) {
+        if (this.open[i].x === step.x && this.open[i].y === step.y) {
+            return this.open[i];
+        }
+    }
+    
+    return false;
+};
+
+AStarPathfinder.prototype.getBestOpen = function () {
+    var bestI = 0;
+    for (var i = 0; i < this.open.length; i++){
+        if (this.open[i].f < this.open[bestI].f) { bestI = i; }
+    }
+    
+    return this.open[bestI];
+};
+
+AStarPathfinder.prototype.findPath = function (xC, yC, xT, yT) {
+    var current,
+        neighbors,
+        neighborRecord,
+        stepCost,
+        i;
+    
+    this.reset().addOpen(new Node(xC, yC, xT, yT, this.step, false));
+    
+    while (this.open.length !== 0) {
+        this.step++;
+        current = this.getBestOpen();
+        
+        if (current.x === xT && current.y === yT) {
+            return this.buildPath(current, []);
+        }
+        
+        this.removeOpen(current).addClosed(current);
+        
+        neighbors = this.map.getNeighbors(current.x, current.y);
+        for (i = 0; i < neighbors.length; i++) {
+            this.step++;
+            
+            stepCost = current.g + this.map.getCost(neighbors[i].x, neighbors[i].y);
+            
+            neighborRecord = this.inClosed(neighbors[i]);
+            if (!neighborRecord || stepCost < neighborRecord.g) {
+                if (!neighborRecord){
+                    this.addOpen(new Node(neighbors[i].x, neighbors[i].y, xT, yT, stepCost, current));
+                } else {
+                    neighborRecord.parent = current;
+                    neighborRecord.g = stepCost;
+                    neighborRecord.f = stepCost + neighborRecord.h;
+                }
+            }        
+        }
+    }     
+};
+
+AStarPathfinder.prototype.buildPath = function (tile, stack) {
+    stack.push(tile);
+    
+    if (tile.parent) {
+        return this.buildPath(tile.parent, stack);
+    } else {
+        return stack;
+    }
+};
+
+AStarPathfinder.prototype.reset = function () {
+        this.closed = [];
+        this.open = [];
+        return this;
+};
+
+AStarPathfinder.prototype.test = function () {
+    var map = new AStarMap();
+    map.initiate(testMap);
+    
+    this.initiate(map);
+    
+    var path = this.findPath(0, 0, 0, 4);
+    console.log(path);
+};
+
+var testMap = [
+    [1, 0, 0, 1, 1],
+    [1, 1, 1, 1, 0],
+    [0, 0, 1, 1, 0],
+    [0, 0, 1, 0, 0],
+    [1, 1, 1, 1, 0]
+]
 var stateManager = function (game) { };
 
 stateManager.boot = function (game) { };
@@ -78,6 +266,68 @@ stateManager.boot.prototype = {
     }
 };
 
+function Enemy (x, y, z, frame) {
+    Phaser.Plugin.Isometric.IsoSprite.call(this, game, x, y, z, 'towerAtlas', frame);
+    
+    this.pathfinder;
+    this.map;
+    
+    this.path = [];
+    this.currentNode = new TileVector(x/71.5, y/71.5);
+    this.currentStep;
+    
+    this.target;
+    
+    this.moveTimer;
+    
+    this.tilePos = {
+        x: x/71.5,
+        y: y/71.5
+    };
+}
+
+Enemy.prototype = Object.create(Phaser.Plugin.Isometric.IsoSprite.prototype);
+Enemy.prototype.constructor = Enemy;
+
+Enemy.prototype.initiate = function (target, pfMap) {
+    this.target = target;
+    
+    this.map = new AStarMap();
+    this.pathfinder = new AStarPathfinder();
+    
+    this.map.initiate(pfMap);
+    this.pathfinder.initiate(this.map);
+    
+    this.path = this.pathfinder.findPath(this.tilePos.x, this.tilePos.y, this.target.x, this.target.y);
+    
+    this.currentStep = this.path.length - 1;
+    
+    this.moveTimer = game.time.events.loop(Phaser.Timer.SECOND, this.move, this);
+    
+    game.add.existing(this);
+};
+
+Enemy.prototype.move = function () {
+    this.currentStep--;
+    
+    if (this.currentStep < 0) { return; }
+    
+    this.currentNode = this.path[this.currentStep];
+    
+    console.log(this.currentNode);
+    
+    this.tilePos.x = this.currentNode.x;
+    this.tilePos.y = this.currentNode.y;
+    
+    this.updateWorldPos();
+};
+
+Enemy.prototype.updateWorldPos = function () {
+    var isoX = this.tilePos.x*71.5;
+    var isoY = this.tilePos.y*71.5;
+    
+    game.add.tween(this).to({ isoX: isoX, isoY: isoY }, 1000, Phaser.Easing.Quadratic.InOut, true);
+};
 stateManager.levelOne = function (game) { 
     this.titleText = null;
     this.titleBG = null;
@@ -91,8 +341,16 @@ stateManager.levelOne = function (game) {
         [ 0, 6, 2, 9, 2, 2],
         [ 0,16, 0, 0, 0,12]
     ];
+    this.pathfindingMap = [
+        [0, 1, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0],
+        [0, 1, 1, 1, 0, 0],
+        [1, 1, 0, 1, 0, 0],
+        [0, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0]
+    ];
     this.towerMap = [
-        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 4, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
@@ -154,6 +412,11 @@ stateManager.levelOne.prototype = {
             fill: "#343434", 
             align: "center" });
         this.titleText.anchor.set(0.5, 0.5);
+        
+        
+        var enemy = new Enemy (1*71.5, 0*71.5, 64, 'enemy1.png');
+        enemy.initiate(new TileVector(5, 4), this.pathfindingMap);
+        enemy.anchor.set(0.5, 0);
     },
     
     update: function () {
@@ -300,6 +563,7 @@ stateManager.loading.prototype = {
         
         //this.load.atlasJSONHash('gameAtlas', 'images/gameAtlas');
         //this.load.audio('music', ['audio/soundtrack.mp3']);
+        this.load.image('enemy1', 'images/enemy1.png');
         this.load.atlasJSONHash('landAtlas', 'images/landAtlas.png', 'images/landAtlas.json');
         this.load.atlasJSONHash('towerAtlas', 'images/towerAtlas.png', 'images/towerAtlas.json');
     },
@@ -314,7 +578,6 @@ stateManager.loading.prototype = {
         } */       
     }
 };
-
 stateManager.menu = function (game) { 
     this.menuTitleText = null;
     this.menuTitleBG = null;
@@ -368,7 +631,7 @@ stateManager.menu.prototype = {
         this.menuTitleBG.anchor.set(0.5, 0.5);
         this.menuTitleBG.scale.setTo(1.6 , 1.3);
         
-        this.menuTitleText = this.add.text(this.world.centerX, this.titleY, 'Tower Defence', { 
+        this.menuTitleText = this.add.text(this.world.centerX, this.titleY, 'Menu', { 
             font: "30px Orbitron", 
             fill: "#343434", 
             align: "center" });
@@ -380,7 +643,7 @@ stateManager.menu.prototype = {
         this.levelTitleBG.anchor.set(0.5, 0.5);
         this.levelTitleBG.scale.setTo(1 , 1);
         
-        this.levelTitleText = this.add.text(this.world.centerX,  this.levelUIY, 'Menu', { 
+        this.levelTitleText = this.add.text(this.world.centerX,  this.levelUIY, '', { 
             font: "30px Orbitron", 
             fill: "#343434", 
             align: "center" });
@@ -408,7 +671,7 @@ stateManager.menu.prototype = {
             }
         } else {
             this.town = null;
-            this.levelTitleText.text = 'Menu';
+            this.levelTitleText.text = '';
         }
     },
     
@@ -456,7 +719,7 @@ var tileLandscapes = ['landscape_28.png', //0 norm
 var tileTowers = ['tower1.png', //1
                   'tower2.png', //2
                   'tower3.png', //3
-                  '', //4
+                  'enemy1.png', //4
                   '', //5
                   '', //6
                   'city1.png', //7

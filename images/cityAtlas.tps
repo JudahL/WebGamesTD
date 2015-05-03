@@ -6,7 +6,7 @@
         <key>texturePackerVersion</key>
         <string>3.7.1</string>
         <key>fileName</key>
-        <string>C:/Users/Judah/Desktop/WebGames/images/menuAlas.tps</string>
+        <string>C:/Users/Judah/Desktop/WebGames/images/cityAtlas.tps</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -38,7 +38,7 @@
         <key>dataFormat</key>
         <string>phaser-json-hash</string>
         <key>textureFileName</key>
-        <filename>menuAtlas.png</filename>
+        <filename>towerAtlas.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrCompressionQuality</key>
@@ -145,7 +145,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>menuAtlas.json</filename>
+                <filename>towerAtlas.json</filename>
             </struct>
         </map>
         <key>multiPack</key>
@@ -188,13 +188,11 @@
         </struct>
         <key>fileList</key>
         <array>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/buttonLong_blue_pressed.png</filename>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/buttonLong_beige.png</filename>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/buttonLong_beige_pressed.png</filename>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/arrowBrown_left.png</filename>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/arrowBrown_right.png</filename>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/buttonSquare_beige_pressed.png</filename>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/buttonSquare_brown_pressed.png</filename>
+            <filename>city2.png</filename>
+            <filename>city1.png</filename>
+            <filename>tower3.png</filename>
+            <filename>tower2.png</filename>
+            <filename>tower1.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

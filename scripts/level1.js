@@ -11,8 +11,16 @@ stateManager.levelOne = function (game) {
         [ 0, 6, 2, 9, 2, 2],
         [ 0,16, 0, 0, 0,12]
     ];
+    this.pathfindingMap = [
+        [0, 1, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0],
+        [0, 1, 1, 1, 0, 0],
+        [1, 1, 0, 1, 0, 0],
+        [0, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0]
+    ];
     this.towerMap = [
-        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 4, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
@@ -74,6 +82,11 @@ stateManager.levelOne.prototype = {
             fill: "#343434", 
             align: "center" });
         this.titleText.anchor.set(0.5, 0.5);
+        
+        
+        var enemy = new Enemy (1*71.5, 0*71.5, 64, 'enemy1.png');
+        enemy.initiate(new TileVector(5, 4), this.pathfindingMap);
+        enemy.anchor.set(0.5, 0);
     },
     
     update: function () {

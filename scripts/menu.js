@@ -51,7 +51,7 @@ stateManager.menu.prototype = {
         this.menuTitleBG.anchor.set(0.5, 0.5);
         this.menuTitleBG.scale.setTo(1.6 , 1.3);
         
-        this.menuTitleText = this.add.text(this.world.centerX, this.titleY, 'Tower Defence', { 
+        this.menuTitleText = this.add.text(this.world.centerX, this.titleY, 'Menu', { 
             font: "30px Orbitron", 
             fill: "#343434", 
             align: "center" });
@@ -63,7 +63,7 @@ stateManager.menu.prototype = {
         this.levelTitleBG.anchor.set(0.5, 0.5);
         this.levelTitleBG.scale.setTo(1 , 1);
         
-        this.levelTitleText = this.add.text(this.world.centerX,  this.levelUIY, 'Menu', { 
+        this.levelTitleText = this.add.text(this.world.centerX,  this.levelUIY, '', { 
             font: "30px Orbitron", 
             fill: "#343434", 
             align: "center" });
@@ -91,7 +91,7 @@ stateManager.menu.prototype = {
             }
         } else {
             this.town = null;
-            this.levelTitleText.text = 'Menu';
+            this.levelTitleText.text = '';
         }
     },
     

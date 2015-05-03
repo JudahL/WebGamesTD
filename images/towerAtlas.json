@@ -2,7 +2,7 @@
 
 "city1.png":
 {
-	"frame": {"x":270,"y":2,"w":90,"h":105},
+	"frame": {"x":324,"y":2,"w":90,"h":105},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":15,"w":90,"h":105},
@@ -10,10 +10,18 @@
 },
 "city2.png":
 {
-	"frame": {"x":362,"y":2,"w":90,"h":93},
+	"frame": {"x":416,"y":2,"w":90,"h":93},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":27,"w":90,"h":93},
+	"sourceSize": {"w":90,"h":120}
+},
+"enemy1.png":
+{
+	"frame": {"x":270,"y":2,"w":52,"h":107},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":21,"y":10,"w":52,"h":107},
 	"sourceSize": {"w":90,"h":120}
 },
 "tower1.png":
@@ -45,8 +53,8 @@
 	"version": "1.0",
 	"image": "towerAtlas.png",
 	"format": "RGBA8888",
-	"size": {"w":454,"h":120},
+	"size": {"w":508,"h":120},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:f2514b7058235bf04a557fc14a1fadec:5c6a66c03c274490114921572426d514:33c40abc4def1f7451a64d145795c671$"
+	"smartupdate": "$TexturePacker:SmartUpdate:8e2d6ce70fac3185e73ea186d15decaf:852fa6e69417fa9af7cc4ca0d4200ec3:33c40abc4def1f7451a64d145795c671$"
 }
 }

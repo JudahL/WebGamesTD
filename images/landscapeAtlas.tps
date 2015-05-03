@@ -6,7 +6,7 @@
         <key>texturePackerVersion</key>
         <string>3.7.1</string>
         <key>fileName</key>
-        <string>C:/Users/Judah/Desktop/WebGames/images/menuAlas.tps</string>
+        <string>C:/Users/Judah/Desktop/WebGames/images/landscapeAtlas.tps</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -38,7 +38,7 @@
         <key>dataFormat</key>
         <string>phaser-json-hash</string>
         <key>textureFileName</key>
-        <filename>menuAtlas.png</filename>
+        <filename>landAtlas.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrCompressionQuality</key>
@@ -145,7 +145,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>menuAtlas.json</filename>
+                <filename>landAtlas.json</filename>
             </struct>
         </map>
         <key>multiPack</key>
@@ -188,13 +188,30 @@
         </struct>
         <key>fileList</key>
         <array>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/buttonLong_blue_pressed.png</filename>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/buttonLong_beige.png</filename>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/buttonLong_beige_pressed.png</filename>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/arrowBrown_left.png</filename>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/arrowBrown_right.png</filename>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/buttonSquare_beige_pressed.png</filename>
-            <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/buttonSquare_brown_pressed.png</filename>
+            <filename>landscape_28.png</filename>
+            <filename>landscape_29.png</filename>
+            <filename>landscape_31.png</filename>
+            <filename>landscape_32.png</filename>
+            <filename>landscape_34.png</filename>
+            <filename>landscape_35.png</filename>
+            <filename>landscape_39.png</filename>
+            <filename>rocks_1.png</filename>
+            <filename>rocks_8.png</filename>
+            <filename>trees_10.png</filename>
+            <filename>landscape_14.png</filename>
+            <filename>landscape_11.png</filename>
+            <filename>landscape_06.png</filename>
+            <filename>landscape_10.png</filename>
+            <filename>crystals_1.png</filename>
+            <filename>D:/KenneyDonation_v31/Art (14.494 files)/Tower Defense assets (230 assets)/PNG/Details/trees_6.png</filename>
+            <filename>D:/KenneyDonation_v31/Art (14.494 files)/Tower Defense assets (230 assets)/PNG/Details/trees_1.png</filename>
+            <filename>D:/KenneyDonation_v31/Art (14.494 files)/Tower Defense assets (230 assets)/PNG/Details/crystals_3.png</filename>
+            <filename>D:/KenneyDonation_v31/Art (14.494 files)/Tower Defense assets (230 assets)/PNG/Landscape/landscape_05.png</filename>
+            <filename>D:/KenneyDonation_v31/Art (14.494 files)/Tower Defense assets (230 assets)/PNG/Landscape/landscape_01.png</filename>
+            <filename>D:/KenneyDonation_v31/Art (14.494 files)/Tower Defense assets (230 assets)/PNG/Landscape/landscape_00.png</filename>
+            <filename>D:/KenneyDonation_v31/Art (14.494 files)/Tower Defense assets (230 assets)/PNG/Landscape/landscape_36.png</filename>
+            <filename>D:/KenneyDonation_v31/Art (14.494 files)/Tower Defense assets (230 assets)/PNG/Landscape/landscape_37.png</filename>
+            <filename>D:/KenneyDonation_v31/Art (14.494 files)/Tower Defense assets (230 assets)/PNG/Landscape/landscape_33.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
