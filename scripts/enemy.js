@@ -20,8 +20,10 @@ function Enemy (x, y, z, frame) {
     };
     
     this.frames = {
-        horizontal: 'batteringRamFlip.png',
-        vertical: 'batteringRam1.png'
+        up: 'batteringRamUp.png',
+        down: 'batteringRamDown.png',
+        left: 'batteringRamLeft.png',
+        right: 'batteringRamRight.png'
     };
     
     this.group
@@ -74,10 +76,14 @@ Enemy.prototype.updateWorldPos = function () {
 };
 
 Enemy.prototype.changeFrame = function () {
-    if (this.currentNode.x > this.tilePos.x || this.currentNode.x < this.tilePos.x) { 
-        this.frameName = this.frames.horizontal; 
-    } else {
-        this.frameName = this.frames.vertical; 
+    if (this.currentNode.x > this.tilePos.x) {
+        this.frameName = this.frames.down; 
+    } else if (this.currentNode.x < this.tilePos.x) {
+        this.frameName = this.frames.up; 
+    } else if (this.currentNode.y < this.tilePos.y) {
+        this.frameName = this.frames.right; 
+    } else if (this.currentNode.y > this.tilePos.y) {
+        this.frameName = this.frames.left; 
     }
 };
 

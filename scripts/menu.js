@@ -52,7 +52,7 @@ stateManager.menu.prototype = {
         this.menuTitleBG.scale.setTo(1.6 , 1.3);
         
         this.menuTitleText = this.add.text(this.world.centerX, this.titleY, 'Menu', { 
-            font: "30px Orbitron", 
+            font: "30px Neucha", 
             fill: "#343434", 
             align: "center" });
         this.menuTitleText.anchor.set(0.5, 0.5);
@@ -64,7 +64,7 @@ stateManager.menu.prototype = {
         this.levelTitleBG.scale.setTo(1 , 1);
         
         this.levelTitleText = this.add.text(this.world.centerX,  this.levelUIY, '', { 
-            font: "30px Orbitron", 
+            font: "30px Neucha", 
             fill: "#343434", 
             align: "center" });
         this.levelTitleText.anchor.set(0.5, 0.5);

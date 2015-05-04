@@ -2,7 +2,7 @@
 
 "arrowBrown_left.png":
 {
-	"frame": {"x":672,"y":2,"w":22,"h":21},
+	"frame": {"x":597,"y":53,"w":22,"h":21},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":22,"h":21},
@@ -10,15 +10,63 @@
 },
 "arrowBrown_right.png":
 {
-	"frame": {"x":672,"y":25,"w":22,"h":21},
+	"frame": {"x":597,"y":76,"w":22,"h":21},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":22,"h":21},
 	"sourceSize": {"w":22,"h":21}
 },
+"barGreen_horizontalLeft.png":
+{
+	"frame": {"x":641,"y":53,"w":9,"h":18},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":9,"h":18},
+	"sourceSize": {"w":9,"h":18}
+},
+"barGreen_horizontalMid.png":
+{
+	"frame": {"x":621,"y":53,"w":18,"h":18},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":18,"h":18},
+	"sourceSize": {"w":18,"h":18}
+},
+"barGreen_horizontalRight.png":
+{
+	"frame": {"x":641,"y":73,"w":9,"h":18},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":9,"h":18},
+	"sourceSize": {"w":9,"h":18}
+},
+"barYellow_horizontalLeft.png":
+{
+	"frame": {"x":652,"y":53,"w":9,"h":18},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":9,"h":18},
+	"sourceSize": {"w":9,"h":18}
+},
+"barYellow_horizontalMid.png":
+{
+	"frame": {"x":621,"y":73,"w":18,"h":18},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":18,"h":18},
+	"sourceSize": {"w":18,"h":18}
+},
+"barYellow_horizontalRight.png":
+{
+	"frame": {"x":652,"y":73,"w":9,"h":18},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":9,"h":18},
+	"sourceSize": {"w":9,"h":18}
+},
 "buttonLong_beige.png":
 {
-	"frame": {"x":2,"y":2,"w":190,"h":49},
+	"frame": {"x":503,"y":2,"w":190,"h":49},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":190,"h":49},
@@ -26,7 +74,7 @@
 },
 "buttonLong_beige_pressed.png":
 {
-	"frame": {"x":194,"y":2,"w":190,"h":45},
+	"frame": {"x":695,"y":2,"w":190,"h":45},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":190,"h":45},
@@ -34,7 +82,7 @@
 },
 "buttonLong_blue_pressed.png":
 {
-	"frame": {"x":386,"y":2,"w":190,"h":45},
+	"frame": {"x":695,"y":49,"w":190,"h":45},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":190,"h":45},
@@ -42,7 +90,7 @@
 },
 "buttonSquare_beige_pressed.png":
 {
-	"frame": {"x":578,"y":2,"w":45,"h":45},
+	"frame": {"x":503,"y":53,"w":45,"h":45},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":45,"h":45},
@@ -50,19 +98,51 @@
 },
 "buttonSquare_brown_pressed.png":
 {
-	"frame": {"x":625,"y":2,"w":45,"h":45},
+	"frame": {"x":550,"y":53,"w":45,"h":45},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":45,"h":45},
 	"sourceSize": {"w":45,"h":45}
+},
+"healthPanel.png":
+{
+	"frame": {"x":2,"y":2,"w":200,"h":100},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":100},
+	"sourceSize": {"w":200,"h":100}
+},
+"panelInset_beige.png":
+{
+	"frame": {"x":408,"y":2,"w":93,"h":94},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":93,"h":94},
+	"sourceSize": {"w":93,"h":94}
+},
+"panel_beige.png":
+{
+	"frame": {"x":204,"y":2,"w":100,"h":100},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":100,"h":100},
+	"sourceSize": {"w":100,"h":100}
+},
+"panel_blue.png":
+{
+	"frame": {"x":306,"y":2,"w":100,"h":100},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":100,"h":100},
+	"sourceSize": {"w":100,"h":100}
 }},
 "meta": {
 	"app": "http://www.codeandweb.com/texturepacker",
 	"version": "1.0",
 	"image": "menuAtlas.png",
 	"format": "RGBA8888",
-	"size": {"w":696,"h":53},
+	"size": {"w":887,"h":104},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:acc8d0b81c13146654636c50359743c2:aac73bc36f72c1561879aa90c26a8863:e40542be9d87bb8871fafdf5d1300b85$"
+	"smartupdate": "$TexturePacker:SmartUpdate:fef81c35d77da88e90b712899b48aa93:7d3199cb7ca1e4859c069d71de13ae87:e40542be9d87bb8871fafdf5d1300b85$"
 }
 }

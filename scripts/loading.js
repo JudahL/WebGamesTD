@@ -15,7 +15,7 @@ stateManager.loading.prototype = {
         this.preloadBar.x = this.world.centerX - this.preloadBar.width/2;
         
         this.loadText = this.add.text(this.world.centerX, this.world.centerY, 'Loading...', { 
-            font: "30px Orbitron", 
+            font: "30px Neucha", 
             fill: "#343434", 
             align: "center" });
         this.loadText.anchor.set(0.5, 0.5);

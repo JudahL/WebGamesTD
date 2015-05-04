@@ -307,8 +307,10 @@ function Enemy (x, y, z, frame) {
     };
     
     this.frames = {
-        horizontal: 'batteringRamFlip.png',
-        vertical: 'batteringRam1.png'
+        up: 'batteringRamUp.png',
+        down: 'batteringRamDown.png',
+        left: 'batteringRamLeft.png',
+        right: 'batteringRamRight.png'
     };
     
     this.group
@@ -361,10 +363,14 @@ Enemy.prototype.updateWorldPos = function () {
 };
 
 Enemy.prototype.changeFrame = function () {
-    if (this.currentNode.x > this.tilePos.x || this.currentNode.x < this.tilePos.x) { 
-        this.frameName = this.frames.horizontal; 
-    } else {
-        this.frameName = this.frames.vertical; 
+    if (this.currentNode.x > this.tilePos.x) {
+        this.frameName = this.frames.down; 
+    } else if (this.currentNode.x < this.tilePos.x) {
+        this.frameName = this.frames.up; 
+    } else if (this.currentNode.y < this.tilePos.y) {
+        this.frameName = this.frames.right; 
+    } else if (this.currentNode.y > this.tilePos.y) {
+        this.frameName = this.frames.left; 
     }
 };
 
@@ -376,125 +382,76 @@ Enemy.prototype.spawn = function (x, y) {
     
     this.setUp();
 }
-stateManager.levelOne = function (game) { 
-    this.titleText = null;
-    this.titleBG = null;
-    this.titleY = 550;
-    this.map = null;
-    this.tileMap = [
+function InfoBar (x, y, text, colour, value) {
+    this.x = x;
+    this.y = y;
+    
+    this.bar = {
+        text: text,
+        offset: 0,
+        l: null,
+        m: null,
+        r: null,
+        colour: colour
+    };
+    
+    this.value = {
+        current: value,
+        max: value
+    }
+}
+
+InfoBar.prototype.createBar = function (offset) {
+    var bar = this.bar;
+    bar.offset = offset;
+    
+    bar.l = game.add.image(this.x-25*3, this.y+bar.offset, 'menuAtlas', 'bar' + bar.colour + '_horizontalLeft.png');
+    bar.l.anchor.set(1, 0.5);
+    bar.m = game.add.image(this.x-25*3, this.y+bar.offset, 'menuAtlas', 'bar' + bar.colour + '_horizontalMid.png');
+    bar.m.anchor.set(0, 0.5);
+    bar.r = game.add.image(bar.m.x + bar.m.width, this.y+bar.offset, 'menuAtlas', 'bar' + bar.colour + '_horizontalRight.png');
+    bar.r.anchor.set(0, 0.5);
+    
+    bar.text = game.add.text(this.x, this.y+bar.offset, bar.text, { 
+            font: "22px Neucha", 
+            fill: "#343434", 
+            align: "center" });
+    bar.text.anchor.set(0.5, 0.5);
+};
+
+InfoBar.prototype.update = function () {
+    this.bar.m.width = this.value.current * 150/100;
+    this.bar.r.x = this.bar.m.x + this.bar.m.width;
+};
+stateManager.levelOne = new Level(game, 'Level One', 550,
+    [
         [ 0, 1, 0,11, 0,15],
         [ 0, 1, 0, 0, 0, 0],
         [14, 7, 2, 3, 0,13],
         [ 2, 8, 0, 1,14, 0],
         [ 0, 6, 2, 9, 2, 2],
         [ 0,16, 0, 0, 0,12]
-    ];
-    this.pathfindingMap = [
+    ],
+    [
         [0, 1, 0, 0, 0, 0],
         [0, 1, 0, 0, 0, 0],
         [0, 1, 1, 1, 0, 0],
         [1, 1, 0, 1, 0, 0],
         [0, 1, 1, 1, 1, 1],
         [0, 0, 0, 0, 0, 0]
-    ];
-    this.towerMap = [
+    ],
+    [                             
         [ 0,10, 0, 0, 0, 0],
         [ 0, 0, 0, 0, 0, 0],
         [ 0, 0, 0, 0, 0, 0],
         [10, 0, 0, 0, 0, 0],
         [ 0, 0, 0, 0, 0,21],
         [ 0, 0, 0, 0, 0, 0]
-    ];
-    this.currentTowerIndex = 0;
-    this.currentTowerImage;
-    this.maxTowers = 3;
-    
-    this.backButton = {
-        arrow: null,
-        button: null
-    };
-};
+    ]);
 
-stateManager.levelOne.prototype = {
-    create: function () { 
-        game.input.deleteMoveCallback(0);
-        
-        this.map = new TileMap(71.5, 0);
-        this.map.initiate(this.tileMap, this.towerMap);
-        
-        
-        this.setUpTitle();
-        this.setUpTowerSelector();
-        this.setUpBackButton();
-        
-        game.input.onDown.add(function (e) {
-            this.map.place = true;
-        }, this);
-        
-        game.input.onUp.add(function () {
-            this.map.place = false;
-        }, this);
-    },
-    
-    setUpTowerSelector: function () {
-        this.currentTowerImage = game.add.image(this.world.centerX+300, this.titleY, 'towerAtlas', 'tower1.png');
-        this.currentTowerImage.anchor.set(0.5, 0.5);
-        
-        this.currentTowerImage.inputEnabled = true;
-        this.currentTowerImage.input.useHandCursor = true;
-        this.currentTowerImage.events.onInputDown.add(this.switchTower, this);
-    },
-    
-    setUpBackButton: function () {
-        this.backButton.button = game.add.button(this.world.centerX-250, this.titleY, 'menuAtlas', this.returnToMenu, this, 
-                                                 'buttonSquare_beige_pressed.png', 'buttonSquare_beige_pressed.png', 'buttonSquare_brown_pressed.png');
-        this.backButton.button.scale.setTo(1.3, 1.3);
-        this.backButton.button.anchor.set(0.5, 0.5);
-        this.backButton.button.input.useHandCursor = true;
-        
-        this.backButton.arrow = game.add.image(this.world.centerX-250, this.titleY, 'menuAtlas', 'arrowBrown_left.png');
-        this.backButton.arrow.anchor.set(0.5, 0.5);
-    },
-    
-    setUpTitle: function () {
-        this.titleBG = this.add.sprite(this.world.centerX, this.titleY, 'menuAtlas', 'buttonLong_beige_pressed.png');
-        this.titleBG.anchor.set(0.5, 0.5);
-        this.titleBG.scale.setTo(1.2 , 1.2);
-        
-        this.titleText = this.add.text(this.world.centerX, this.titleY, 'Level 1', { 
-            font: "30px Orbitron", 
-            fill: "#343434", 
-            align: "center" });
-        this.titleText.anchor.set(0.5, 0.5);
-    },
-    
-    
-    update: function () {
-        this.map.update();
-    },
-    
-    loadLevel: function () {
-        
-    },
-    
-    switchTower: function () {
-        this.currentTowerIndex++;
-        this.currentTowerIndex %= 3;
-        this.currentTowerImage.frameName = tileTowers[this.currentTowerIndex];
-    },
-    
-    returnToMenu: function () {
-        game.state.start('menu');
-    }
-    
-            
-};
-stateManager.levelTwo = function (game) { 
-    this.titleText = null;
-    this.titleBG = null;
-    this.titleY = 600;
-    this.map = null;
-    this.tileMap = [
+
+stateManager.levelTwo = new Level (game, 'Level Two', 600,
+    [
         [14,18, 0,14, 0, 1,16],
         [17,22, 0, 0, 0, 1, 0],
         [ 0, 4, 2, 2, 2, 5,20],
@@ -502,16 +459,34 @@ stateManager.levelTwo = function (game) {
         [13, 6, 2, 2, 2, 3,18],
         [ 0,15, 0, 0,11, 1,21],
         [ 0, 0, 0, 0, 0, 1, 0]
-    ];
-    this.towerMap = [
+    ],
+    [
+        [0, 0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 1, 0],
+        [0, 1, 1, 1, 1, 1, 0],
+        [1, 1, 0, 0, 0, 0, 0],
+        [0, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 1, 0]
+    ],
+    [
+        [0, 0, 0, 0, 0,10, 0],
         [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0],
+        [23, 0, 0, 0, 0, 0,0],
         [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0]
-    ];
+        [0, 0, 0, 0, 0,10, 0]
+    ]);
+function Level (game, title, titleY, tileM, pathM, towerM) { 
+    this.titleText = title;
+    this.titleBG = null;
+    this.titleY = titleY;
+    this.map = null;
+    this.tileMap = tileM;
+    this.pathfindingMap = pathM;
+    this.towerMap = towerM;
+    
     this.currentTowerIndex = 0;
     this.currentTowerImage;
     this.maxTowers = 3;
@@ -520,75 +495,93 @@ stateManager.levelTwo = function (game) {
         arrow: null,
         button: null
     };
+    
+    this.info;
 };
 
-stateManager.levelTwo.prototype = {
-    create: function () { 
-        game.input.deleteMoveCallback(0);
-        
-        this.map = new TileMap(71.5, 0);
-        this.map.initiate(this.tileMap, this.towerMap);
-        this.map.spawnTiles(this.map.towerMap, 64, true);
-        
-        this.setUpTitle();
-        
-        game.input.onDown.add(function (e) {
-            this.map.place = true;
-        }, this);
-        
-        game.input.onUp.add(function () {
-            this.map.place = false;
-        }, this);
-        
-        this.currentTowerImage = game.add.image(this.world.centerX+300, this.titleY, 'towerAtlas', 'tower1.png');
-        this.currentTowerImage.anchor.set(0.5, 0.5);
-        
-        this.currentTowerImage.inputEnabled = true;
-        this.currentTowerImage.input.useHandCursor = true;
-        this.currentTowerImage.events.onInputDown.add(this.switchTower, this);
-        
-       
-        this.backButton.button = game.add.button(this.world.centerX-250, this.titleY, 'menuAtlas', this.returnToMenu, this, 'buttonSquare_beige_pressed.png', 'buttonSquare_beige_pressed.png', 'buttonSquare_brown_pressed.png');
-        this.backButton.button.scale.setTo(1.3, 1.3);
-        this.backButton.button.anchor.set(0.5, 0.5);
-        this.backButton.button.input.useHandCursor = true;
-        
-        this.backButton.arrow = game.add.image(this.world.centerX-250, this.titleY, 'menuAtlas', 'arrowBrown_left.png');
-        this.backButton.arrow.anchor.set(0.5, 0.5);
-    },
-    
-    setUpTitle: function () {
-        this.titleBG = this.add.sprite(this.world.centerX, this.titleY, 'menuAtlas', 'buttonLong_beige_pressed.png');
-        this.titleBG.anchor.set(0.5, 0.5);
-        this.titleBG.scale.setTo(1.2 , 1.2);
-        
-        this.titleText = this.add.text(this.world.centerX, this.titleY, 'Level 2', { 
-            font: "30px Orbitron", 
-            fill: "#343434", 
-            align: "center" });
-        this.titleText.anchor.set(0.5, 0.5);
-    },
-    
-    update: function () {
-        this.map.update();
-    },
-    
-    loadLevel: function () {
-        
-    },
-    
-    switchTower: function () {
-        this.currentTowerIndex++;
-        this.currentTowerIndex %= 3;
-        this.currentTowerImage.frameName = tileTowers[this.currentTowerIndex];
-    },
-    
-    returnToMenu: function () {
-        game.state.start('menu');
-    }
-    
-            
+Level.prototype.create = function () { 
+    game.input.deleteMoveCallback(0);
+
+    this.map = new TileMap(71.5, 0);
+    this.map.initiate(this.tileMap, this.towerMap);
+
+    this.setUpTitle();
+    this.setUpTowerSelector();
+    this.setUpBackButton();
+    this.setUpInfo();
+
+    game.input.onDown.add(function (e) {
+        this.map.place = true;
+    }, this);
+
+    game.input.onUp.add(function () {
+        this.map.place = false;
+    }, this);
 };
+
+
+    
+Level.prototype.setUpTowerSelector = function () {
+    this.currentTowerBG = game.add.image(this.world.centerX+380, this.titleY, 'menuAtlas', 'panel_beige.png');
+
+    this.currentTowerBG.scale.setTo(1.3, 1.3);
+    this.currentTowerBG.anchor.set(0.5, 0.5);
+
+    this.currentTowerImage = game.add.image(this.world.centerX+380, this.titleY, 'towerAtlas', 'tower1.png');
+    this.currentTowerImage.anchor.set(0.5, 0.5);
+
+    this.currentTowerImage.inputEnabled = true;
+    this.currentTowerImage.input.useHandCursor = true;
+    this.currentTowerImage.events.onInputDown.add(this.switchTower, this);
+};
+    
+Level.prototype.setUpBackButton = function () {
+    this.backButton.button = game.add.button(this.world.centerX-250, this.titleY, 'menuAtlas', this.returnToMenu, this, 
+                'buttonSquare_beige_pressed.png', 'buttonSquare_beige_pressed.png', 'buttonSquare_brown_pressed.png');
+
+    this.backButton.button.scale.setTo(1.3, 1.3);
+    this.backButton.button.anchor.set(0.5, 0.5);
+    this.backButton.button.input.useHandCursor = true;
+
+    this.backButton.arrow = game.add.image(this.world.centerX-250, this.titleY, 'menuAtlas', 'arrowBrown_left.png');
+    this.backButton.arrow.anchor.set(0.5, 0.5);
+};
+
+Level.prototype.setUpTitle = function () {
+    this.titleBG = this.add.sprite(this.world.centerX, this.titleY, 'menuAtlas', 'buttonLong_beige_pressed.png');
+    this.titleBG.anchor.set(0.5, 0.5);
+    this.titleBG.scale.setTo(1.2 , 1.2);
+
+    this.titleText = this.add.text(this.world.centerX, this.titleY, this.titleText, { 
+        font: "30px Neucha", 
+        fill: "#343434", 
+        align: "center" });
+    this.titleText.anchor.set(0.5, 0.5);
+};
+
+Level.prototype.setUpInfo = function () {
+    this.info = new PlayerInfo (this.world.centerX+230, this.titleY);
+    this.info.initiate();
+
+    this.info.add('Health','Green', 100);
+    this.info.add('Gold', 'Yellow', 100); 
+};
+
+
+Level.prototype.update = function () {
+    this.map.update();
+    this.info.update();
+};
+
+Level.prototype.switchTower = function () {
+    this.currentTowerIndex++;
+    this.currentTowerIndex %= 3;
+    this.currentTowerImage.frameName = tileTowers[this.currentTowerIndex];
+};
+
+Level.prototype.returnToMenu = function () {
+    game.state.start('menu');
+};        
 stateManager.loading = function (game) { 
     this.preloadBar = null;
     this.loadText = null;
@@ -606,7 +599,7 @@ stateManager.loading.prototype = {
         this.preloadBar.x = this.world.centerX - this.preloadBar.width/2;
         
         this.loadText = this.add.text(this.world.centerX, this.world.centerY, 'Loading...', { 
-            font: "30px Orbitron", 
+            font: "30px Neucha", 
             fill: "#343434", 
             align: "center" });
         this.loadText.anchor.set(0.5, 0.5);
@@ -682,7 +675,7 @@ stateManager.menu.prototype = {
         this.menuTitleBG.scale.setTo(1.6 , 1.3);
         
         this.menuTitleText = this.add.text(this.world.centerX, this.titleY, 'Menu', { 
-            font: "30px Orbitron", 
+            font: "30px Neucha", 
             fill: "#343434", 
             align: "center" });
         this.menuTitleText.anchor.set(0.5, 0.5);
@@ -694,7 +687,7 @@ stateManager.menu.prototype = {
         this.levelTitleBG.scale.setTo(1 , 1);
         
         this.levelTitleText = this.add.text(this.world.centerX,  this.levelUIY, '', { 
-            font: "30px Orbitron", 
+            font: "30px Neucha", 
             fill: "#343434", 
             align: "center" });
         this.levelTitleText.anchor.set(0.5, 0.5);
@@ -741,6 +734,35 @@ stateManager.menu.prototype = {
     }
         
 };
+function PlayerInfo (x, y) {
+    this.x = x;
+    this.y = y;
+    
+    this.bg;
+    
+    this.offsetChunk = 25;
+    
+    this.bars = [];
+};
+
+PlayerInfo.prototype.initiate = function () {
+    this.bg = game.add.image(this.x, this.y, 'menuAtlas', 'healthPanel.png');
+    this.bg.anchor.set(0.5, 0.5);
+};
+
+PlayerInfo.prototype.add = function (offset, text, colour, value) {
+    var info = new InfoBar(this.x, this.y, offset, text, colour, value);
+    this.bars.push(info);
+    info.createBar((this.bars.length-1)*this.offsetChunk);
+};
+
+PlayerInfo.prototype.update = function () {
+    for (var i = 0; i < this.bars.length; i++){
+        this.bars[i].update();
+    }
+};
+
+
 function Spawner (state, x, y, z, frequency) {
     this.state = state;
     
@@ -770,7 +792,7 @@ Spawner.prototype.initiate = function (target) {
 Spawner.prototype.createEnemies = function () {
     var enemy, i;
     for (i = 0; i < this.max; i++){
-        enemy = new Enemy(this.x, this.y, this.z, 'batteringRam1.png');
+        enemy = new Enemy(this.x, this.y, this.z, 'batteringRamUp.png');
         enemy.initiate(this.target, this.state.pathfindingMap, this.state.map.tileGroup);
         enemy.anchor.set(0.5, -0.5);
         enemy.kill();
@@ -874,7 +896,7 @@ TileMap.prototype.spawnTiles = function (tm, zz, tower) {
                     tile = new Tower(game, xx, yy, zz, 'towerAtlas', tileTowers[tileI-1]);
                     this.tileGroup.add(tile);
                 } else if (tileI != 0 && tileI >= 10 && tileI < 20){
-                    spawner = new Spawner(game.state.getCurrentState(), xx, yy, zz, 6);
+                    spawner = new Spawner(game.state.getCurrentState(), xx, yy, 53, 6);
                     this.spawners.push(spawner);
                 } else if (tileI != 0 && tileI >= 20) {
                     this.base = this.createBase (tileI, xx, yy);

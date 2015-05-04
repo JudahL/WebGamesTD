@@ -27,7 +27,7 @@ Spawner.prototype.initiate = function (target) {
 Spawner.prototype.createEnemies = function () {
     var enemy, i;
     for (i = 0; i < this.max; i++){
-        enemy = new Enemy(this.x, this.y, this.z, 'batteringRam1.png');
+        enemy = new Enemy(this.x, this.y, this.z, 'batteringRamUp.png');
         enemy.initiate(this.target, this.state.pathfindingMap, this.state.map.tileGroup);
         enemy.anchor.set(0.5, -0.5);
         enemy.kill();

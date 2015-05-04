@@ -16,17 +16,33 @@
 	"spriteSourceSize": {"x":0,"y":7,"w":132,"h":213},
 	"sourceSize": {"w":132,"h":220}
 },
-"batteringRam1.png":
+"batteringRamDown.png":
 {
-	"frame": {"x":228,"y":120,"w":67,"h":71},
+	"frame": {"x":185,"y":233,"w":66,"h":71},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":1,"y":0,"w":66,"h":71},
+	"sourceSize": {"w":67,"h":71}
+},
+"batteringRamLeft.png":
+{
+	"frame": {"x":2,"y":427,"w":67,"h":71},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":67,"h":71},
 	"sourceSize": {"w":67,"h":71}
 },
-"batteringRamFlip.png":
+"batteringRamRight.png":
 {
-	"frame": {"x":297,"y":120,"w":66,"h":71},
+	"frame": {"x":71,"y":427,"w":67,"h":71},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":67,"h":71},
+	"sourceSize": {"w":67,"h":71}
+},
+"batteringRamUp.png":
+{
+	"frame": {"x":185,"y":306,"w":66,"h":71},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":1,"y":0,"w":66,"h":71},
@@ -34,7 +50,7 @@
 },
 "city1.png":
 {
-	"frame": {"x":410,"y":2,"w":90,"h":105},
+	"frame": {"x":136,"y":126,"w":90,"h":105},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":15,"w":90,"h":105},
@@ -42,7 +58,7 @@
 },
 "city2.png":
 {
-	"frame": {"x":136,"y":126,"w":90,"h":93},
+	"frame": {"x":2,"y":217,"w":90,"h":93},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":27,"w":90,"h":93},
@@ -50,7 +66,7 @@
 },
 "tower1.png":
 {
-	"frame": {"x":228,"y":2,"w":89,"h":116},
+	"frame": {"x":94,"y":233,"w":89,"h":116},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":1,"y":4,"w":89,"h":116},
@@ -58,7 +74,7 @@
 },
 "tower2.png":
 {
-	"frame": {"x":319,"y":2,"w":89,"h":113},
+	"frame": {"x":2,"y":312,"w":89,"h":113},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":1,"y":7,"w":89,"h":113},
@@ -66,7 +82,7 @@
 },
 "tower3.png":
 {
-	"frame": {"x":410,"y":109,"w":84,"h":111},
+	"frame": {"x":140,"y":379,"w":84,"h":111},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":3,"y":9,"w":84,"h":111},
@@ -77,8 +93,8 @@
 	"version": "1.0",
 	"image": "towerAtlas.png",
 	"format": "RGBA8888",
-	"size": {"w":502,"h":222},
+	"size": {"w":253,"h":500},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:078263687ba259222a621a47f31443b6:7a05f85bf29ac485601f748d8a299fea:33c40abc4def1f7451a64d145795c671$"
+	"smartupdate": "$TexturePacker:SmartUpdate:5611ceb8a785c18260d03086b87c3f1a:226242fdbf3518a671ab9a3666c0091d:33c40abc4def1f7451a64d145795c671$"
 }
 }

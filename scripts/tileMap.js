@@ -48,7 +48,7 @@ TileMap.prototype.spawnTiles = function (tm, zz, tower) {
                     tile = new Tower(game, xx, yy, zz, 'towerAtlas', tileTowers[tileI-1]);
                     this.tileGroup.add(tile);
                 } else if (tileI != 0 && tileI >= 10 && tileI < 20){
-                    spawner = new Spawner(game.state.getCurrentState(), xx, yy, zz, 6);
+                    spawner = new Spawner(game.state.getCurrentState(), xx, yy, 53, 6);
                     this.spawners.push(spawner);
                 } else if (tileI != 0 && tileI >= 20) {
                     this.base = this.createBase (tileI, xx, yy);
