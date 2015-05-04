@@ -8,9 +8,7 @@ function Level (game, title, titleY, tileM, pathM, towerM) {
     this.pathfindingMap = pathM;
     this.towerMap = towerM;
     
-    this.currentTowerIndex = 0;
     this.currentTowerImage;
-    this.maxTowers = 3;
     
     this.backButton = {
         arrow: null,
@@ -20,8 +18,6 @@ function Level (game, title, titleY, tileM, pathM, towerM) {
     this.info;
     this.towerInfo;
     
-    this.playerHealth = 100;
-    this.playerGold = 20;
     this.goldTimer;
 };
 
@@ -41,15 +37,17 @@ Level.prototype.create = function () {
     this.goldTimer = game.time.events.loop(Phaser.Timer.SECOND, this.grantGold, this);
 };
 
-
     
 Level.prototype.setUpTowerSelector = function () {
+    player.reset();
+    towerList.reset();
+    
     this.currentTowerBG = game.add.image(this.world.centerX+380, this.titleY, 'menuAtlas', 'panel_beige.png');
 
     this.currentTowerBG.scale.setTo(1.3, 1.3);
     this.currentTowerBG.anchor.set(0.5, 0.5);
 
-    this.currentTowerImage = game.add.image(this.world.centerX+380, this.titleY, 'towerAtlas', tileTowers[this.currentTowerIndex]);
+    this.currentTowerImage = game.add.image(this.world.centerX+380, this.titleY, 'towerAtlas', towerList.get('frame'));
     this.currentTowerImage.anchor.set(0.5, 0.5);
 
     this.currentTowerImage.inputEnabled = true;
@@ -85,16 +83,16 @@ Level.prototype.setUpInfo = function () {
     this.info = new PlayerInfo (this.world.centerX-230, this.titleY);
     this.info.initiate();
 
-    this.info.add('Health','Green', 100);
-    this.info.add('Gold', 'Yellow', 100); 
+    this.info.add('Health','Green', player.health.max);
+    this.info.add('Gold', 'Yellow', player.gold.max); 
 };
 
 Level.prototype.setUpTowerInfo = function () {
     this.towerInfo = new PlayerInfo (this.world.centerX+230, this.titleY);
     this.towerInfo.initiate();
 
-    this.towerInfo.add('Damage','Red', 100);
-    this.towerInfo.add('Gold Cost', 'Yellow', 100);
+    this.towerInfo.add('Damage','Red', 80);
+    this.towerInfo.add('Gold Cost', 'Yellow', 200);
 };
 
 Level.prototype.setUpInput = function () {
@@ -111,14 +109,15 @@ Level.prototype.update = function () {
     this.map.update();
     this.info.update();
     this.towerInfo.update();
-    this.info.setValue('Health', this.playerHealth);
-    this.info.setValue('Gold', this.playerGold);
+    this.info.setValue('Health', player.health.current);
+    this.info.setValue('Gold', player.gold.current);
+    this.towerInfo.setValue('Damage', towerList.get('damage'));
+    this.towerInfo.setValue('Gold Cost', towerList.get('cost'));
 };
 
 Level.prototype.switchTower = function () {
-    this.currentTowerIndex++;
-    this.currentTowerIndex %= 3;
-    this.currentTowerImage.frameName = tileTowers[this.currentTowerIndex];
+    towerList.switchTower();
+    this.currentTowerImage.frameName = towerList.get('frame');
 };
 
 Level.prototype.returnToMenu = function () {
@@ -126,8 +125,8 @@ Level.prototype.returnToMenu = function () {
 };        
 
 Level.prototype.grantGold = function () {
-    this.playerGold += 1;
-    if (this.playerGold > 100) {
-        this.playerGold = 100;
+    player.gold.current += 1;
+    if (player.gold.current > 100) {
+        player.gold.current = 100;
     }
 }

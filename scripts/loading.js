@@ -28,6 +28,8 @@ stateManager.loading.prototype = {
     },
 
     create: function () {
+        towerList.initiate();
+        
         this.state.start('menu');
     },
 

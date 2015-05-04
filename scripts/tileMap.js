@@ -79,7 +79,7 @@ TileMap.prototype.update = function () {
     
     this.tileGroup.forEach(this.checkTileForCursor, this);
     
-    if (this.place) { this.placeTower(tileTowers[game.state.getCurrentState().currentTowerIndex]); } 
+    if (this.place) { this.placeTower(tileTowers[towerList.currentIndex]); } 
     
     game.iso.simpleSort(this.tileGroup);
 };

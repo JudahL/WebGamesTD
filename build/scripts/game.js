@@ -423,7 +423,7 @@ InfoBar.prototype.createBar = function (offset) {
 };
 
 InfoBar.prototype.update = function () {
-    this.bar.m.width = (this.value.current * 150/100) + 1;
+    this.bar.m.width = this.value.current * (150/100) * (100/this.value.max) + 1;
     this.bar.r.x = this.bar.m.x + this.bar.m.width - 1;
     
     this.bar.text.text = this.bar.textValue + this.value.current;
@@ -493,9 +493,7 @@ function Level (game, title, titleY, tileM, pathM, towerM) {
     this.pathfindingMap = pathM;
     this.towerMap = towerM;
     
-    this.currentTowerIndex = 0;
     this.currentTowerImage;
-    this.maxTowers = 3;
     
     this.backButton = {
         arrow: null,
@@ -505,8 +503,6 @@ function Level (game, title, titleY, tileM, pathM, towerM) {
     this.info;
     this.towerInfo;
     
-    this.playerHealth = 100;
-    this.playerGold = 20;
     this.goldTimer;
 };
 
@@ -526,15 +522,17 @@ Level.prototype.create = function () {
     this.goldTimer = game.time.events.loop(Phaser.Timer.SECOND, this.grantGold, this);
 };
 
-
     
 Level.prototype.setUpTowerSelector = function () {
+    player.reset();
+    towerList.reset();
+    
     this.currentTowerBG = game.add.image(this.world.centerX+380, this.titleY, 'menuAtlas', 'panel_beige.png');
 
     this.currentTowerBG.scale.setTo(1.3, 1.3);
     this.currentTowerBG.anchor.set(0.5, 0.5);
 
-    this.currentTowerImage = game.add.image(this.world.centerX+380, this.titleY, 'towerAtlas', tileTowers[this.currentTowerIndex]);
+    this.currentTowerImage = game.add.image(this.world.centerX+380, this.titleY, 'towerAtlas', towerList.get('frame'));
     this.currentTowerImage.anchor.set(0.5, 0.5);
 
     this.currentTowerImage.inputEnabled = true;
@@ -570,16 +568,16 @@ Level.prototype.setUpInfo = function () {
     this.info = new PlayerInfo (this.world.centerX-230, this.titleY);
     this.info.initiate();
 
-    this.info.add('Health','Green', 100);
-    this.info.add('Gold', 'Yellow', 100); 
+    this.info.add('Health','Green', player.health.max);
+    this.info.add('Gold', 'Yellow', player.gold.max); 
 };
 
 Level.prototype.setUpTowerInfo = function () {
     this.towerInfo = new PlayerInfo (this.world.centerX+230, this.titleY);
     this.towerInfo.initiate();
 
-    this.towerInfo.add('Damage','Red', 100);
-    this.towerInfo.add('Gold Cost', 'Yellow', 100);
+    this.towerInfo.add('Damage','Red', 80);
+    this.towerInfo.add('Gold Cost', 'Yellow', 200);
 };
 
 Level.prototype.setUpInput = function () {
@@ -596,14 +594,15 @@ Level.prototype.update = function () {
     this.map.update();
     this.info.update();
     this.towerInfo.update();
-    this.info.setValue('Health', this.playerHealth);
-    this.info.setValue('Gold', this.playerGold);
+    this.info.setValue('Health', player.health.current);
+    this.info.setValue('Gold', player.gold.current);
+    this.towerInfo.setValue('Damage', towerList.get('damage'));
+    this.towerInfo.setValue('Gold Cost', towerList.get('cost'));
 };
 
 Level.prototype.switchTower = function () {
-    this.currentTowerIndex++;
-    this.currentTowerIndex %= 3;
-    this.currentTowerImage.frameName = tileTowers[this.currentTowerIndex];
+    towerList.switchTower();
+    this.currentTowerImage.frameName = towerList.get('frame');
 };
 
 Level.prototype.returnToMenu = function () {
@@ -611,9 +610,9 @@ Level.prototype.returnToMenu = function () {
 };        
 
 Level.prototype.grantGold = function () {
-    this.playerGold += 1;
-    if (this.playerGold > 100) {
-        this.playerGold = 100;
+    player.gold.current += 1;
+    if (player.gold.current > 100) {
+        player.gold.current = 100;
     }
 }
 stateManager.loading = function (game) { 
@@ -646,6 +645,8 @@ stateManager.loading.prototype = {
     },
 
     create: function () {
+        towerList.initiate();
+        
         this.state.start('menu');
     },
 
@@ -768,6 +769,28 @@ stateManager.menu.prototype = {
     }
         
 };
+var player = {
+    health: {
+        max: 100,
+        current: 100
+    },
+    
+    gold: {
+        max: 300,
+        current: 20
+    },
+    
+    reset: function (){
+        this.health.current = this.health.max;
+        this.gold.current = 20;
+    },
+    
+    takeDamage: function (damage) {
+        this.health.current -= damage;
+    }
+};
+
+
 function PlayerInfo (x, y) {
     this.x = x;
     this.y = y;
@@ -969,7 +992,7 @@ TileMap.prototype.update = function () {
     
     this.tileGroup.forEach(this.checkTileForCursor, this);
     
-    if (this.place) { this.placeTower(tileTowers[game.state.getCurrentState().currentTowerIndex]); } 
+    if (this.place) { this.placeTower(tileTowers[towerList.currentIndex]); } 
     
     game.iso.simpleSort(this.tileGroup);
 };
@@ -1099,6 +1122,35 @@ function Tower (game, x, y, z, key, frame) {
 
 Tower.prototype = Object.create(Phaser.Plugin.Isometric.IsoSprite.prototype);
 Tower.prototype.constructor = Tower;
+var towerList = {
+    currentIndex: 0,
+    list: [],
+    
+    initiate: function () {
+        this.list.push(new TowerType('Archer Tower', 40, 50, 'tower3.png'));
+        this.list.push(new TowerType('Mage Tower', 20, 125, 'tower2.png'));
+        this.list.push(new TowerType('Cannon Tower', 80, 200, 'tower1.png'));
+    },
+
+    switchTower: function () {
+        this.currentIndex++;
+        this.currentIndex %= 3;
+    },
+    
+    reset: function () {
+        this.currentIndex = 0;
+    },
+    
+    get: function (param) {
+        return this.list[this.currentIndex][param];
+    }
+};
+function TowerType (name, damage, cost, frame) {
+    this.name = name;
+    this.damage = damage;
+    this.cost = cost;
+    this.frame = frame;
+}
 var game = new Phaser.Game(900, 670, Phaser.AUTO, 'test', null, true, false);
 
 game.state.add('boot', stateManager.boot);

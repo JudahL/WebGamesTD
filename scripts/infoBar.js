@@ -39,7 +39,7 @@ InfoBar.prototype.createBar = function (offset) {
 };
 
 InfoBar.prototype.update = function () {
-    this.bar.m.width = (this.value.current * 150/100) + 1;
+    this.bar.m.width = this.value.current * (150/100) * (100/this.value.max) + 1;
     this.bar.r.x = this.bar.m.x + this.bar.m.width - 1;
     
     this.bar.text.text = this.bar.textValue + this.value.current;
