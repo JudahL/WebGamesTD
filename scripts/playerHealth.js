@@ -26,3 +26,11 @@ PlayerInfo.prototype.update = function () {
     }
 };
 
+PlayerInfo.prototype.setValue = function (name, value) {
+    for (var i = 0; i < this.bars.length; i++){
+        if (this.bars[i].name === name){
+            this.bars[i].value.current = value;
+        }
+    }
+}
+

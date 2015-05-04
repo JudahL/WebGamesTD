@@ -1,9 +1,12 @@
 function InfoBar (x, y, text, colour, value) {
+    this.name = text;
+    
     this.x = x;
     this.y = y;
     
     this.bar = {
-        text: text,
+        textValue: text + ": ",
+        text: null,
         offset: 0,
         l: null,
         m: null,
@@ -28,7 +31,7 @@ InfoBar.prototype.createBar = function (offset) {
     bar.r = game.add.image(bar.m.x + bar.m.width, this.y+bar.offset, 'menuAtlas', 'bar' + bar.colour + '_horizontalRight.png');
     bar.r.anchor.set(0, 0.5);
     
-    bar.text = game.add.text(this.x, this.y+bar.offset, bar.text, { 
+    bar.text = game.add.text(this.x, this.y+bar.offset, bar.textValue, { 
             font: "22px Neucha", 
             fill: "#343434", 
             align: "center" });
@@ -36,6 +39,8 @@ InfoBar.prototype.createBar = function (offset) {
 };
 
 InfoBar.prototype.update = function () {
-    this.bar.m.width = this.value.current * 150/100;
-    this.bar.r.x = this.bar.m.x + this.bar.m.width;
+    this.bar.m.width = (this.value.current * 150/100) + 1;
+    this.bar.r.x = this.bar.m.x + this.bar.m.width - 1;
+    
+    this.bar.text.text = this.bar.textValue + this.value.current;
 };

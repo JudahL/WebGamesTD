@@ -383,11 +383,14 @@ Enemy.prototype.spawn = function (x, y) {
     this.setUp();
 }
 function InfoBar (x, y, text, colour, value) {
+    this.name = text;
+    
     this.x = x;
     this.y = y;
     
     this.bar = {
-        text: text,
+        textValue: text + ": ",
+        text: null,
         offset: 0,
         l: null,
         m: null,
@@ -412,7 +415,7 @@ InfoBar.prototype.createBar = function (offset) {
     bar.r = game.add.image(bar.m.x + bar.m.width, this.y+bar.offset, 'menuAtlas', 'bar' + bar.colour + '_horizontalRight.png');
     bar.r.anchor.set(0, 0.5);
     
-    bar.text = game.add.text(this.x, this.y+bar.offset, bar.text, { 
+    bar.text = game.add.text(this.x, this.y+bar.offset, bar.textValue, { 
             font: "22px Neucha", 
             fill: "#343434", 
             align: "center" });
@@ -420,8 +423,10 @@ InfoBar.prototype.createBar = function (offset) {
 };
 
 InfoBar.prototype.update = function () {
-    this.bar.m.width = this.value.current * 150/100;
-    this.bar.r.x = this.bar.m.x + this.bar.m.width;
+    this.bar.m.width = (this.value.current * 150/100) + 1;
+    this.bar.r.x = this.bar.m.x + this.bar.m.width - 1;
+    
+    this.bar.text.text = this.bar.textValue + this.value.current;
 };
 stateManager.levelOne = new Level(game, 'Level One', 550,
     [
@@ -479,7 +484,8 @@ stateManager.levelTwo = new Level (game, 'Level Two', 600,
         [0, 0, 0, 0, 0,10, 0]
     ]);
 function Level (game, title, titleY, tileM, pathM, towerM) { 
-    this.titleText = title;
+    this.titleText = null;
+    this.titleTextValue = title;
     this.titleBG = null;
     this.titleY = titleY;
     this.map = null;
@@ -497,6 +503,11 @@ function Level (game, title, titleY, tileM, pathM, towerM) {
     };
     
     this.info;
+    this.towerInfo;
+    
+    this.playerHealth = 100;
+    this.playerGold = 20;
+    this.goldTimer;
 };
 
 Level.prototype.create = function () { 
@@ -509,14 +520,10 @@ Level.prototype.create = function () {
     this.setUpTowerSelector();
     this.setUpBackButton();
     this.setUpInfo();
-
-    game.input.onDown.add(function (e) {
-        this.map.place = true;
-    }, this);
-
-    game.input.onUp.add(function () {
-        this.map.place = false;
-    }, this);
+    this.setUpTowerInfo();
+    this.setUpInput();
+    
+    this.goldTimer = game.time.events.loop(Phaser.Timer.SECOND, this.grantGold, this);
 };
 
 
@@ -527,7 +534,7 @@ Level.prototype.setUpTowerSelector = function () {
     this.currentTowerBG.scale.setTo(1.3, 1.3);
     this.currentTowerBG.anchor.set(0.5, 0.5);
 
-    this.currentTowerImage = game.add.image(this.world.centerX+380, this.titleY, 'towerAtlas', 'tower1.png');
+    this.currentTowerImage = game.add.image(this.world.centerX+380, this.titleY, 'towerAtlas', tileTowers[this.currentTowerIndex]);
     this.currentTowerImage.anchor.set(0.5, 0.5);
 
     this.currentTowerImage.inputEnabled = true;
@@ -536,14 +543,14 @@ Level.prototype.setUpTowerSelector = function () {
 };
     
 Level.prototype.setUpBackButton = function () {
-    this.backButton.button = game.add.button(this.world.centerX-250, this.titleY, 'menuAtlas', this.returnToMenu, this, 
+    this.backButton.button = game.add.button(50, 50, 'menuAtlas', this.returnToMenu, this, 
                 'buttonSquare_beige_pressed.png', 'buttonSquare_beige_pressed.png', 'buttonSquare_brown_pressed.png');
 
     this.backButton.button.scale.setTo(1.3, 1.3);
     this.backButton.button.anchor.set(0.5, 0.5);
     this.backButton.button.input.useHandCursor = true;
 
-    this.backButton.arrow = game.add.image(this.world.centerX-250, this.titleY, 'menuAtlas', 'arrowBrown_left.png');
+    this.backButton.arrow = game.add.image(50, 50, 'menuAtlas', 'arrowBrown_left.png');
     this.backButton.arrow.anchor.set(0.5, 0.5);
 };
 
@@ -552,7 +559,7 @@ Level.prototype.setUpTitle = function () {
     this.titleBG.anchor.set(0.5, 0.5);
     this.titleBG.scale.setTo(1.2 , 1.2);
 
-    this.titleText = this.add.text(this.world.centerX, this.titleY, this.titleText, { 
+    this.titleText = this.add.text(this.world.centerX, this.titleY, this.titleTextValue, { 
         font: "30px Neucha", 
         fill: "#343434", 
         align: "center" });
@@ -560,17 +567,37 @@ Level.prototype.setUpTitle = function () {
 };
 
 Level.prototype.setUpInfo = function () {
-    this.info = new PlayerInfo (this.world.centerX+230, this.titleY);
+    this.info = new PlayerInfo (this.world.centerX-230, this.titleY);
     this.info.initiate();
 
     this.info.add('Health','Green', 100);
     this.info.add('Gold', 'Yellow', 100); 
 };
 
+Level.prototype.setUpTowerInfo = function () {
+    this.towerInfo = new PlayerInfo (this.world.centerX+230, this.titleY);
+    this.towerInfo.initiate();
+
+    this.towerInfo.add('Damage','Red', 100);
+    this.towerInfo.add('Gold Cost', 'Yellow', 100);
+};
+
+Level.prototype.setUpInput = function () {
+    game.input.onDown.add(function (e) {
+        this.map.place = true;
+    }, this);
+
+    game.input.onUp.add(function () {
+        this.map.place = false;
+    }, this);
+};
 
 Level.prototype.update = function () {
     this.map.update();
     this.info.update();
+    this.towerInfo.update();
+    this.info.setValue('Health', this.playerHealth);
+    this.info.setValue('Gold', this.playerGold);
 };
 
 Level.prototype.switchTower = function () {
@@ -582,6 +609,13 @@ Level.prototype.switchTower = function () {
 Level.prototype.returnToMenu = function () {
     game.state.start('menu');
 };        
+
+Level.prototype.grantGold = function () {
+    this.playerGold += 1;
+    if (this.playerGold > 100) {
+        this.playerGold = 100;
+    }
+}
 stateManager.loading = function (game) { 
     this.preloadBar = null;
     this.loadText = null;
@@ -702,11 +736,11 @@ stateManager.menu.prototype = {
             this.town = this.map.currentTile.tower.frameName;
             switch (this.town) {
                 case 'city1.png':
-                     this.levelTitleText.text = 'Level 1';
+                    this.levelTitleText.text = 'Level One';
                     break;
                     
                 case 'city2.png':
-                     this.levelTitleText.text = 'Level 2';
+                    this.levelTitleText.text = 'Level Two';
                     break;
                     
                 default:
@@ -761,6 +795,14 @@ PlayerInfo.prototype.update = function () {
         this.bars[i].update();
     }
 };
+
+PlayerInfo.prototype.setValue = function (name, value) {
+    for (var i = 0; i < this.bars.length; i++){
+        if (this.bars[i].name === name){
+            this.bars[i].value.current = value;
+        }
+    }
+}
 
 
 function Spawner (state, x, y, z, frequency) {
@@ -838,9 +880,9 @@ var tileLandscapes = ['landscape_28.png', //0 norm
                       'landscape_05.png']; //22 right up
 
 
-var tileTowers = ['tower1.png', //1
+var tileTowers = ['tower3.png', //1
                   'tower2.png', //2
-                  'tower3.png', //3
+                  'tower1.png', //3
                   'batteringRam1.png', //4
                   '', //5
                   '', //6

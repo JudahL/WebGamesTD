@@ -79,11 +79,11 @@ stateManager.menu.prototype = {
             this.town = this.map.currentTile.tower.frameName;
             switch (this.town) {
                 case 'city1.png':
-                     this.levelTitleText.text = 'Level 1';
+                    this.levelTitleText.text = 'Level One';
                     break;
                     
                 case 'city2.png':
-                     this.levelTitleText.text = 'Level 2';
+                    this.levelTitleText.text = 'Level Two';
                     break;
                     
                 default:
