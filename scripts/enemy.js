@@ -38,15 +38,17 @@ Enemy.prototype.initiate = function (target, pfMap, group) {
     
     this.map.initiate(pfMap);
     this.pathfinder.initiate(this.map);
-    
+   
+    this.group = group;
+    this.group.add(this);
+};
+
+Enemy.prototype.setUp = function (){
     this.path = this.pathfinder.findPath(this.tilePos.x, this.tilePos.y, this.target.x, this.target.y);
     
     this.currentStep = this.path.length - 1;
     
     this.moveTimer = game.time.events.loop(Phaser.Timer.SECOND, this.move, this);
-    
-    this.group = group;
-    this.group.add(this);
 };
 
 Enemy.prototype.move = function () {
@@ -57,8 +59,6 @@ Enemy.prototype.move = function () {
     this.currentNode = this.path[this.currentStep];
     
     this.changeFrame();
-    
-    console.log(this.currentNode);
     
     this.tilePos.x = this.currentNode.x;
     this.tilePos.y = this.currentNode.y;
@@ -80,3 +80,12 @@ Enemy.prototype.changeFrame = function () {
         this.frameName = this.frames.vertical; 
     }
 };
+
+Enemy.prototype.spawn = function (x, y) {
+    this.revive();
+    
+    this.x = x;
+    this.y = y;
+    
+    this.setUp();
+}

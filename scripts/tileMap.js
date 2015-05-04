@@ -4,6 +4,10 @@ function TileMap (size) {
     this.size = size || 71.5;
     this.tileGroup = game.add.group();
     this.zz = 0;
+    
+    this.spawners = [];
+    
+    this.base;
 
     this.currentTile = {
         tile: null,
@@ -19,21 +23,36 @@ TileMap.prototype.initiate = function (map, tMap) {
     this.setMap (map, tMap);
     if (this.tileMap) {
         this.spawnTiles(this.tileMap, this.zz, false);
+        this.spawnTiles(this.towerMap, 64, true);
+        this.initiateSpawners();
         game.iso.simpleSort(this.tileGroup);
     }
 };
 
+TileMap.prototype.initiateSpawners = function () {
+    for (var i = 0; i < this.spawners.length; i++) {
+        this.spawners[i].initiate(this.base.getTilePos());
+    }
+};
+
 TileMap.prototype.spawnTiles = function (tm, zz, tower) {
-    var tile;
+    var tile, spawner, tileI;
     var m = tm[0].length;
     for (var xx = 0; xx < this.size*m; xx += this.size) {
         for (var yy = 0; yy < this.size*m; yy += this.size) {
+            tileI = tm[yy/this.size][xx/this.size];
             if (tower == false) {
-                tile = game.add.isoSprite(xx, yy, zz, 'landAtlas', tileLandscapes[tm[yy/this.size][xx/this.size]], this.tileGroup);
+                tile = game.add.isoSprite(xx, yy, zz, 'landAtlas', tileLandscapes[tileI], this.tileGroup);
             } else {
-                if (tm[yy/this.size][xx/this.size] != 0) {
-                    tile = new Tower(game, xx, yy, zz, 'towerAtlas', tileTowers[tm[yy/this.size][xx/this.size]-1]);
+                if (tileI != 0 && tileI < 10) {
+                    tile = new Tower(game, xx, yy, zz, 'towerAtlas', tileTowers[tileI-1]);
                     this.tileGroup.add(tile);
+                } else if (tileI != 0 && tileI >= 10 && tileI < 20){
+                    spawner = new Spawner(game.state.getCurrentState(), xx, yy, zz, 6);
+                    this.spawners.push(spawner);
+                } else if (tileI != 0 && tileI >= 20) {
+                    this.base = this.createBase (tileI, xx, yy);
+                    this.tileGroup.add(this.base);
                 }
             }
             if (tile && tower) {
@@ -137,9 +156,46 @@ TileMap.prototype.placeTower = function (towerType) {
         var tower = new Tower(game, xx, yy, 64, 'towerAtlas', towerType);
         this.tileGroup.add(tower);
         tower.anchor.set(0.5, 0);
-        //game.iso.simpleSort(this.tileGroup);
         game.add.tween(tower).to({ isoZ: 72 }, 200, Phaser.Easing.Quadratic.InOut, true);
         this.currentTile.tower = tower;
         this.place = false;
     }
+};
+
+TileMap.prototype.createBase = function (i, x, y) {
+    var xx = x, 
+        yy = y,
+        zz = 0,
+        tile;
+    
+    switch (i%20){
+            
+        case 0:
+            yy -= this.size;
+            break;
+        case 1:
+            xx += this.size;
+            break;
+        case 2:
+            yy += this.size;
+            break;
+        case 3:
+            xx -= this.size;
+            break;
+        
+        default:
+            break;
+            
+    }
+    
+    tile = new Base(xx, yy, zz, new TileVector(x/this.size, y/this.size),'base1.png');
+    var extension = (tile.height - 99);
+    
+    if (i%20 === 0 || i%20 === 3) {
+        tile.anchor.set(0.5, extension/tile.height);
+    } else {
+        tile.isoPosition.z = extension-1;
+        tile.anchor.set(0.5, 0);
+    }
+    return tile;
 };

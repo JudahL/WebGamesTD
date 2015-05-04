@@ -243,6 +243,25 @@ var testMap = [
     [0, 0, 1, 0, 0],
     [1, 1, 1, 1, 0]
 ]
+function Base (x, y, z, tilePos, frame) {
+    Phaser.Plugin.Isometric.IsoSprite.call(this, game, x, y, z, 'towerAtlas', frame);
+    
+    this.tower = true;
+    
+    this.health = {
+        current: 100,
+        max: 100
+    };
+    
+    this.tilePos = tilePos
+}
+
+Base.prototype = Object.create(Phaser.Plugin.Isometric.IsoSprite.prototype);
+Base.prototype.constructor = Base;
+
+Base.prototype.getTilePos = function () {
+    return this.tilePos;
+};  
 var stateManager = function (game) { };
 
 stateManager.boot = function (game) { };
@@ -306,15 +325,17 @@ Enemy.prototype.initiate = function (target, pfMap, group) {
     
     this.map.initiate(pfMap);
     this.pathfinder.initiate(this.map);
-    
+   
+    this.group = group;
+    this.group.add(this);
+};
+
+Enemy.prototype.setUp = function (){
     this.path = this.pathfinder.findPath(this.tilePos.x, this.tilePos.y, this.target.x, this.target.y);
     
     this.currentStep = this.path.length - 1;
     
     this.moveTimer = game.time.events.loop(Phaser.Timer.SECOND, this.move, this);
-    
-    this.group = group;
-    this.group.add(this);
 };
 
 Enemy.prototype.move = function () {
@@ -325,8 +346,6 @@ Enemy.prototype.move = function () {
     this.currentNode = this.path[this.currentStep];
     
     this.changeFrame();
-    
-    console.log(this.currentNode);
     
     this.tilePos.x = this.currentNode.x;
     this.tilePos.y = this.currentNode.y;
@@ -348,6 +367,15 @@ Enemy.prototype.changeFrame = function () {
         this.frameName = this.frames.vertical; 
     }
 };
+
+Enemy.prototype.spawn = function (x, y) {
+    this.revive();
+    
+    this.x = x;
+    this.y = y;
+    
+    this.setUp();
+}
 stateManager.levelOne = function (game) { 
     this.titleText = null;
     this.titleBG = null;
@@ -370,12 +398,12 @@ stateManager.levelOne = function (game) {
         [0, 0, 0, 0, 0, 0]
     ];
     this.towerMap = [
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0]
+        [ 0,10, 0, 0, 0, 0],
+        [ 0, 0, 0, 0, 0, 0],
+        [ 0, 0, 0, 0, 0, 0],
+        [10, 0, 0, 0, 0, 0],
+        [ 0, 0, 0, 0, 0,21],
+        [ 0, 0, 0, 0, 0, 0]
     ];
     this.currentTowerIndex = 0;
     this.currentTowerImage;
@@ -393,7 +421,7 @@ stateManager.levelOne.prototype = {
         
         this.map = new TileMap(71.5, 0);
         this.map.initiate(this.tileMap, this.towerMap);
-        this.map.spawnTiles(this.map.towerMap, 64, true);
+        
         
         this.setUpTitle();
         this.setUpTowerSelector();
@@ -438,11 +466,6 @@ stateManager.levelOne.prototype = {
             fill: "#343434", 
             align: "center" });
         this.titleText.anchor.set(0.5, 0.5);
-        
-        
-        var enemy = new Enemy (1*71.5, 0*71.5, 53, 'batteringRam1.png');
-        enemy.initiate(new TileVector(5, 4), this.pathfindingMap, this.map.tileGroup);
-        enemy.anchor.set(0.5, -0.5);
     },
     
     
@@ -718,6 +741,56 @@ stateManager.menu.prototype = {
     }
         
 };
+function Spawner (state, x, y, z, frequency) {
+    this.state = state;
+    
+    this.target;
+    
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    
+    this.timer;
+    this.freq = frequency;
+    this.max = 10;
+    
+    this.tower = true;
+    
+    this.enemyGroup = [];
+}
+
+Spawner.prototype.initiate = function (target) {
+    this.timer = game.time.events.loop(Phaser.Timer.SECOND*this.freq, this.spawn, this);
+    
+    this.target = target;
+    
+    this.createEnemies();
+};
+
+Spawner.prototype.createEnemies = function () {
+    var enemy, i;
+    for (i = 0; i < this.max; i++){
+        enemy = new Enemy(this.x, this.y, this.z, 'batteringRam1.png');
+        enemy.initiate(this.target, this.state.pathfindingMap, this.state.map.tileGroup);
+        enemy.anchor.set(0.5, -0.5);
+        enemy.kill();
+        
+        this.enemyGroup.push(enemy);
+    }
+};
+
+Spawner.prototype.spawn = function () {
+    var enemy = this.getEnemy();
+    if (enemy) { enemy.spawn(); }
+};
+
+Spawner.prototype.getEnemy = function () {
+    for (i = 0; i < this.max; i++){
+        if (!this.enemyGroup[i].alive){
+            return this.enemyGroup[i];
+        }
+    }
+};
 var tileLandscapes = ['landscape_28.png', //0 norm
                       'landscape_29.png', //1 vert
                       'landscape_32.png', //2 horiz
@@ -757,6 +830,10 @@ function TileMap (size) {
     this.size = size || 71.5;
     this.tileGroup = game.add.group();
     this.zz = 0;
+    
+    this.spawners = [];
+    
+    this.base;
 
     this.currentTile = {
         tile: null,
@@ -772,21 +849,36 @@ TileMap.prototype.initiate = function (map, tMap) {
     this.setMap (map, tMap);
     if (this.tileMap) {
         this.spawnTiles(this.tileMap, this.zz, false);
+        this.spawnTiles(this.towerMap, 64, true);
+        this.initiateSpawners();
         game.iso.simpleSort(this.tileGroup);
     }
 };
 
+TileMap.prototype.initiateSpawners = function () {
+    for (var i = 0; i < this.spawners.length; i++) {
+        this.spawners[i].initiate(this.base.getTilePos());
+    }
+};
+
 TileMap.prototype.spawnTiles = function (tm, zz, tower) {
-    var tile;
+    var tile, spawner, tileI;
     var m = tm[0].length;
     for (var xx = 0; xx < this.size*m; xx += this.size) {
         for (var yy = 0; yy < this.size*m; yy += this.size) {
+            tileI = tm[yy/this.size][xx/this.size];
             if (tower == false) {
-                tile = game.add.isoSprite(xx, yy, zz, 'landAtlas', tileLandscapes[tm[yy/this.size][xx/this.size]], this.tileGroup);
+                tile = game.add.isoSprite(xx, yy, zz, 'landAtlas', tileLandscapes[tileI], this.tileGroup);
             } else {
-                if (tm[yy/this.size][xx/this.size] != 0) {
-                    tile = new Tower(game, xx, yy, zz, 'towerAtlas', tileTowers[tm[yy/this.size][xx/this.size]-1]);
+                if (tileI != 0 && tileI < 10) {
+                    tile = new Tower(game, xx, yy, zz, 'towerAtlas', tileTowers[tileI-1]);
                     this.tileGroup.add(tile);
+                } else if (tileI != 0 && tileI >= 10 && tileI < 20){
+                    spawner = new Spawner(game.state.getCurrentState(), xx, yy, zz, 6);
+                    this.spawners.push(spawner);
+                } else if (tileI != 0 && tileI >= 20) {
+                    this.base = this.createBase (tileI, xx, yy);
+                    this.tileGroup.add(this.base);
                 }
             }
             if (tile && tower) {
@@ -890,11 +982,48 @@ TileMap.prototype.placeTower = function (towerType) {
         var tower = new Tower(game, xx, yy, 64, 'towerAtlas', towerType);
         this.tileGroup.add(tower);
         tower.anchor.set(0.5, 0);
-        //game.iso.simpleSort(this.tileGroup);
         game.add.tween(tower).to({ isoZ: 72 }, 200, Phaser.Easing.Quadratic.InOut, true);
         this.currentTile.tower = tower;
         this.place = false;
     }
+};
+
+TileMap.prototype.createBase = function (i, x, y) {
+    var xx = x, 
+        yy = y,
+        zz = 0,
+        tile;
+    
+    switch (i%20){
+            
+        case 0:
+            yy -= this.size;
+            break;
+        case 1:
+            xx += this.size;
+            break;
+        case 2:
+            yy += this.size;
+            break;
+        case 3:
+            xx -= this.size;
+            break;
+        
+        default:
+            break;
+            
+    }
+    
+    tile = new Base(xx, yy, zz, new TileVector(x/this.size, y/this.size),'base1.png');
+    var extension = (tile.height - 99);
+    
+    if (i%20 === 0 || i%20 === 3) {
+        tile.anchor.set(0.5, extension/tile.height);
+    } else {
+        tile.isoPosition.z = extension-1;
+        tile.anchor.set(0.5, 0);
+    }
+    return tile;
 };
 
 function Tower (game, x, y, z, key, frame) {

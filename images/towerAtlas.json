@@ -1,8 +1,24 @@
 {"frames": {
 
+"base.png":
+{
+	"frame": {"x":136,"y":2,"w":90,"h":122},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":8,"w":90,"h":122},
+	"sourceSize": {"w":90,"h":130}
+},
+"base1.png":
+{
+	"frame": {"x":2,"y":2,"w":132,"h":213},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":7,"w":132,"h":213},
+	"sourceSize": {"w":132,"h":220}
+},
 "batteringRam1.png":
 {
-	"frame": {"x":454,"y":2,"w":67,"h":71},
+	"frame": {"x":228,"y":120,"w":67,"h":71},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":67,"h":71},
@@ -10,7 +26,7 @@
 },
 "batteringRamFlip.png":
 {
-	"frame": {"x":523,"y":2,"w":66,"h":71},
+	"frame": {"x":297,"y":120,"w":66,"h":71},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":1,"y":0,"w":66,"h":71},
@@ -18,7 +34,7 @@
 },
 "city1.png":
 {
-	"frame": {"x":270,"y":2,"w":90,"h":105},
+	"frame": {"x":410,"y":2,"w":90,"h":105},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":15,"w":90,"h":105},
@@ -26,7 +42,7 @@
 },
 "city2.png":
 {
-	"frame": {"x":362,"y":2,"w":90,"h":93},
+	"frame": {"x":136,"y":126,"w":90,"h":93},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":27,"w":90,"h":93},
@@ -34,7 +50,7 @@
 },
 "tower1.png":
 {
-	"frame": {"x":2,"y":2,"w":89,"h":116},
+	"frame": {"x":228,"y":2,"w":89,"h":116},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":1,"y":4,"w":89,"h":116},
@@ -42,7 +58,7 @@
 },
 "tower2.png":
 {
-	"frame": {"x":93,"y":2,"w":89,"h":113},
+	"frame": {"x":319,"y":2,"w":89,"h":113},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":1,"y":7,"w":89,"h":113},
@@ -50,7 +66,7 @@
 },
 "tower3.png":
 {
-	"frame": {"x":184,"y":2,"w":84,"h":111},
+	"frame": {"x":410,"y":109,"w":84,"h":111},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":3,"y":9,"w":84,"h":111},
@@ -61,8 +77,8 @@
 	"version": "1.0",
 	"image": "towerAtlas.png",
 	"format": "RGBA8888",
-	"size": {"w":591,"h":120},
+	"size": {"w":502,"h":222},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:2dce91cd6cb16cf9fd2f66e7af455a63:d4d124251d3297eec26d1f58b4c0ad84:33c40abc4def1f7451a64d145795c671$"
+	"smartupdate": "$TexturePacker:SmartUpdate:078263687ba259222a621a47f31443b6:7a05f85bf29ac485601f748d8a299fea:33c40abc4def1f7451a64d145795c671$"
 }
 }

@@ -20,12 +20,12 @@ stateManager.levelOne = function (game) {
         [0, 0, 0, 0, 0, 0]
     ];
     this.towerMap = [
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0]
+        [ 0,10, 0, 0, 0, 0],
+        [ 0, 0, 0, 0, 0, 0],
+        [ 0, 0, 0, 0, 0, 0],
+        [10, 0, 0, 0, 0, 0],
+        [ 0, 0, 0, 0, 0,21],
+        [ 0, 0, 0, 0, 0, 0]
     ];
     this.currentTowerIndex = 0;
     this.currentTowerImage;
@@ -43,7 +43,7 @@ stateManager.levelOne.prototype = {
         
         this.map = new TileMap(71.5, 0);
         this.map.initiate(this.tileMap, this.towerMap);
-        this.map.spawnTiles(this.map.towerMap, 64, true);
+        
         
         this.setUpTitle();
         this.setUpTowerSelector();
@@ -88,11 +88,6 @@ stateManager.levelOne.prototype = {
             fill: "#343434", 
             align: "center" });
         this.titleText.anchor.set(0.5, 0.5);
-        
-        
-        var enemy = new Enemy (1*71.5, 0*71.5, 53, 'batteringRam1.png');
-        enemy.initiate(new TileVector(5, 4), this.pathfindingMap, this.map.tileGroup);
-        enemy.anchor.set(0.5, -0.5);
     },
     
     
