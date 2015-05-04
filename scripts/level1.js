@@ -7,7 +7,7 @@ stateManager.levelOne = function (game) {
         [ 0, 1, 0,11, 0,15],
         [ 0, 1, 0, 0, 0, 0],
         [14, 7, 2, 3, 0,13],
-        [ 2, 8, 0, 1, 0, 0],
+        [ 2, 8, 0, 1,14, 0],
         [ 0, 6, 2, 9, 2, 2],
         [ 0,16, 0, 0, 0,12]
     ];
@@ -20,7 +20,7 @@ stateManager.levelOne = function (game) {
         [0, 0, 0, 0, 0, 0]
     ];
     this.towerMap = [
-        [0, 0, 0, 0, 4, 0],
+        [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
@@ -46,6 +46,8 @@ stateManager.levelOne.prototype = {
         this.map.spawnTiles(this.map.towerMap, 64, true);
         
         this.setUpTitle();
+        this.setUpTowerSelector();
+        this.setUpBackButton();
         
         game.input.onDown.add(function (e) {
             this.map.place = true;
@@ -54,16 +56,20 @@ stateManager.levelOne.prototype = {
         game.input.onUp.add(function () {
             this.map.place = false;
         }, this);
-        
+    },
+    
+    setUpTowerSelector: function () {
         this.currentTowerImage = game.add.image(this.world.centerX+300, this.titleY, 'towerAtlas', 'tower1.png');
         this.currentTowerImage.anchor.set(0.5, 0.5);
         
         this.currentTowerImage.inputEnabled = true;
         this.currentTowerImage.input.useHandCursor = true;
         this.currentTowerImage.events.onInputDown.add(this.switchTower, this);
-        
-       
-        this.backButton.button = game.add.button(this.world.centerX-250, this.titleY, 'menuAtlas', this.returnToMenu, this, 'buttonSquare_beige_pressed.png', 'buttonSquare_beige_pressed.png', 'buttonSquare_brown_pressed.png');
+    },
+    
+    setUpBackButton: function () {
+        this.backButton.button = game.add.button(this.world.centerX-250, this.titleY, 'menuAtlas', this.returnToMenu, this, 
+                                                 'buttonSquare_beige_pressed.png', 'buttonSquare_beige_pressed.png', 'buttonSquare_brown_pressed.png');
         this.backButton.button.scale.setTo(1.3, 1.3);
         this.backButton.button.anchor.set(0.5, 0.5);
         this.backButton.button.input.useHandCursor = true;
@@ -84,10 +90,11 @@ stateManager.levelOne.prototype = {
         this.titleText.anchor.set(0.5, 0.5);
         
         
-        var enemy = new Enemy (1*71.5, 0*71.5, 64, 'enemy1.png');
-        enemy.initiate(new TileVector(5, 4), this.pathfindingMap);
-        enemy.anchor.set(0.5, 0);
+        var enemy = new Enemy (1*71.5, 0*71.5, 53, 'batteringRam1.png');
+        enemy.initiate(new TileVector(5, 4), this.pathfindingMap, this.map.tileGroup);
+        enemy.anchor.set(0.5, -0.5);
     },
+    
     
     update: function () {
         this.map.update();

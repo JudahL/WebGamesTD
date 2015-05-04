@@ -60,11 +60,13 @@ TileMap.prototype.update = function () {
     
     this.tileGroup.forEach(this.checkTileForCursor, this);
     
-    if (this.place) { this.placeTower(tileTowers[game.state.getCurrentState().currentTowerIndex]); }
+    if (this.place) { this.placeTower(tileTowers[game.state.getCurrentState().currentTowerIndex]); } 
+    
+    game.iso.simpleSort(this.tileGroup);
 };
 
 TileMap.prototype.checkTileForCursor = function (tile) {
-    if (tile.tower) { return; }
+    if (tile.tower || tile.enemy) { return; }
     var inBounds = tile.isoBounds.containsXY(game.cursorPos.x, game.cursorPos.y);
     if (!tile.selected && inBounds) {
         this.selectTile(tile);
@@ -135,7 +137,7 @@ TileMap.prototype.placeTower = function (towerType) {
         var tower = new Tower(game, xx, yy, 64, 'towerAtlas', towerType);
         this.tileGroup.add(tower);
         tower.anchor.set(0.5, 0);
-        game.iso.simpleSort(this.tileGroup);
+        //game.iso.simpleSort(this.tileGroup);
         game.add.tween(tower).to({ isoZ: 72 }, 200, Phaser.Easing.Quadratic.InOut, true);
         this.currentTile.tower = tower;
         this.place = false;

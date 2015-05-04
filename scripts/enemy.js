@@ -1,6 +1,8 @@
 function Enemy (x, y, z, frame) {
     Phaser.Plugin.Isometric.IsoSprite.call(this, game, x, y, z, 'towerAtlas', frame);
     
+    this.enemy = true;
+    
     this.pathfinder;
     this.map;
     
@@ -16,12 +18,19 @@ function Enemy (x, y, z, frame) {
         x: x/71.5,
         y: y/71.5
     };
+    
+    this.frames = {
+        horizontal: 'batteringRamFlip.png',
+        vertical: 'batteringRam1.png'
+    };
+    
+    this.group
 }
 
 Enemy.prototype = Object.create(Phaser.Plugin.Isometric.IsoSprite.prototype);
 Enemy.prototype.constructor = Enemy;
 
-Enemy.prototype.initiate = function (target, pfMap) {
+Enemy.prototype.initiate = function (target, pfMap, group) {
     this.target = target;
     
     this.map = new AStarMap();
@@ -36,7 +45,8 @@ Enemy.prototype.initiate = function (target, pfMap) {
     
     this.moveTimer = game.time.events.loop(Phaser.Timer.SECOND, this.move, this);
     
-    game.add.existing(this);
+    this.group = group;
+    this.group.add(this);
 };
 
 Enemy.prototype.move = function () {
@@ -45,6 +55,8 @@ Enemy.prototype.move = function () {
     if (this.currentStep < 0) { return; }
     
     this.currentNode = this.path[this.currentStep];
+    
+    this.changeFrame();
     
     console.log(this.currentNode);
     
@@ -59,4 +71,12 @@ Enemy.prototype.updateWorldPos = function () {
     var isoY = this.tilePos.y*71.5;
     
     game.add.tween(this).to({ isoX: isoX, isoY: isoY }, 1000, Phaser.Easing.Quadratic.InOut, true);
+};
+
+Enemy.prototype.changeFrame = function () {
+    if (this.currentNode.x > this.tilePos.x || this.currentNode.x < this.tilePos.x) { 
+        this.frameName = this.frames.horizontal; 
+    } else {
+        this.frameName = this.frames.vertical; 
+    }
 };

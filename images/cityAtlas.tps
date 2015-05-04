@@ -193,6 +193,7 @@
             <filename>tower3.png</filename>
             <filename>tower2.png</filename>
             <filename>tower1.png</filename>
+            <filename>enemy1.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

@@ -269,6 +269,8 @@ stateManager.boot.prototype = {
 function Enemy (x, y, z, frame) {
     Phaser.Plugin.Isometric.IsoSprite.call(this, game, x, y, z, 'towerAtlas', frame);
     
+    this.enemy = true;
+    
     this.pathfinder;
     this.map;
     
@@ -284,12 +286,19 @@ function Enemy (x, y, z, frame) {
         x: x/71.5,
         y: y/71.5
     };
+    
+    this.frames = {
+        horizontal: 'batteringRamFlip.png',
+        vertical: 'batteringRam1.png'
+    };
+    
+    this.group
 }
 
 Enemy.prototype = Object.create(Phaser.Plugin.Isometric.IsoSprite.prototype);
 Enemy.prototype.constructor = Enemy;
 
-Enemy.prototype.initiate = function (target, pfMap) {
+Enemy.prototype.initiate = function (target, pfMap, group) {
     this.target = target;
     
     this.map = new AStarMap();
@@ -304,7 +313,8 @@ Enemy.prototype.initiate = function (target, pfMap) {
     
     this.moveTimer = game.time.events.loop(Phaser.Timer.SECOND, this.move, this);
     
-    game.add.existing(this);
+    this.group = group;
+    this.group.add(this);
 };
 
 Enemy.prototype.move = function () {
@@ -313,6 +323,8 @@ Enemy.prototype.move = function () {
     if (this.currentStep < 0) { return; }
     
     this.currentNode = this.path[this.currentStep];
+    
+    this.changeFrame();
     
     console.log(this.currentNode);
     
@@ -328,6 +340,14 @@ Enemy.prototype.updateWorldPos = function () {
     
     game.add.tween(this).to({ isoX: isoX, isoY: isoY }, 1000, Phaser.Easing.Quadratic.InOut, true);
 };
+
+Enemy.prototype.changeFrame = function () {
+    if (this.currentNode.x > this.tilePos.x || this.currentNode.x < this.tilePos.x) { 
+        this.frameName = this.frames.horizontal; 
+    } else {
+        this.frameName = this.frames.vertical; 
+    }
+};
 stateManager.levelOne = function (game) { 
     this.titleText = null;
     this.titleBG = null;
@@ -337,7 +357,7 @@ stateManager.levelOne = function (game) {
         [ 0, 1, 0,11, 0,15],
         [ 0, 1, 0, 0, 0, 0],
         [14, 7, 2, 3, 0,13],
-        [ 2, 8, 0, 1, 0, 0],
+        [ 2, 8, 0, 1,14, 0],
         [ 0, 6, 2, 9, 2, 2],
         [ 0,16, 0, 0, 0,12]
     ];
@@ -350,7 +370,7 @@ stateManager.levelOne = function (game) {
         [0, 0, 0, 0, 0, 0]
     ];
     this.towerMap = [
-        [0, 0, 0, 0, 4, 0],
+        [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
@@ -376,6 +396,8 @@ stateManager.levelOne.prototype = {
         this.map.spawnTiles(this.map.towerMap, 64, true);
         
         this.setUpTitle();
+        this.setUpTowerSelector();
+        this.setUpBackButton();
         
         game.input.onDown.add(function (e) {
             this.map.place = true;
@@ -384,16 +406,20 @@ stateManager.levelOne.prototype = {
         game.input.onUp.add(function () {
             this.map.place = false;
         }, this);
-        
+    },
+    
+    setUpTowerSelector: function () {
         this.currentTowerImage = game.add.image(this.world.centerX+300, this.titleY, 'towerAtlas', 'tower1.png');
         this.currentTowerImage.anchor.set(0.5, 0.5);
         
         this.currentTowerImage.inputEnabled = true;
         this.currentTowerImage.input.useHandCursor = true;
         this.currentTowerImage.events.onInputDown.add(this.switchTower, this);
-        
-       
-        this.backButton.button = game.add.button(this.world.centerX-250, this.titleY, 'menuAtlas', this.returnToMenu, this, 'buttonSquare_beige_pressed.png', 'buttonSquare_beige_pressed.png', 'buttonSquare_brown_pressed.png');
+    },
+    
+    setUpBackButton: function () {
+        this.backButton.button = game.add.button(this.world.centerX-250, this.titleY, 'menuAtlas', this.returnToMenu, this, 
+                                                 'buttonSquare_beige_pressed.png', 'buttonSquare_beige_pressed.png', 'buttonSquare_brown_pressed.png');
         this.backButton.button.scale.setTo(1.3, 1.3);
         this.backButton.button.anchor.set(0.5, 0.5);
         this.backButton.button.input.useHandCursor = true;
@@ -414,10 +440,11 @@ stateManager.levelOne.prototype = {
         this.titleText.anchor.set(0.5, 0.5);
         
         
-        var enemy = new Enemy (1*71.5, 0*71.5, 64, 'enemy1.png');
-        enemy.initiate(new TileVector(5, 4), this.pathfindingMap);
-        enemy.anchor.set(0.5, 0);
+        var enemy = new Enemy (1*71.5, 0*71.5, 53, 'batteringRam1.png');
+        enemy.initiate(new TileVector(5, 4), this.pathfindingMap, this.map.tileGroup);
+        enemy.anchor.set(0.5, -0.5);
     },
+    
     
     update: function () {
         this.map.update();
@@ -719,7 +746,7 @@ var tileLandscapes = ['landscape_28.png', //0 norm
 var tileTowers = ['tower1.png', //1
                   'tower2.png', //2
                   'tower3.png', //3
-                  'enemy1.png', //4
+                  'batteringRam1.png', //4
                   '', //5
                   '', //6
                   'city1.png', //7
@@ -786,11 +813,13 @@ TileMap.prototype.update = function () {
     
     this.tileGroup.forEach(this.checkTileForCursor, this);
     
-    if (this.place) { this.placeTower(tileTowers[game.state.getCurrentState().currentTowerIndex]); }
+    if (this.place) { this.placeTower(tileTowers[game.state.getCurrentState().currentTowerIndex]); } 
+    
+    game.iso.simpleSort(this.tileGroup);
 };
 
 TileMap.prototype.checkTileForCursor = function (tile) {
-    if (tile.tower) { return; }
+    if (tile.tower || tile.enemy) { return; }
     var inBounds = tile.isoBounds.containsXY(game.cursorPos.x, game.cursorPos.y);
     if (!tile.selected && inBounds) {
         this.selectTile(tile);
@@ -861,7 +890,7 @@ TileMap.prototype.placeTower = function (towerType) {
         var tower = new Tower(game, xx, yy, 64, 'towerAtlas', towerType);
         this.tileGroup.add(tower);
         tower.anchor.set(0.5, 0);
-        game.iso.simpleSort(this.tileGroup);
+        //game.iso.simpleSort(this.tileGroup);
         game.add.tween(tower).to({ isoZ: 72 }, 200, Phaser.Easing.Quadratic.InOut, true);
         this.currentTile.tower = tower;
         this.place = false;

@@ -26,7 +26,7 @@ var tileLandscapes = ['landscape_28.png', //0 norm
 var tileTowers = ['tower1.png', //1
                   'tower2.png', //2
                   'tower3.png', //3
-                  'enemy1.png', //4
+                  'batteringRam1.png', //4
                   '', //5
                   '', //6
                   'city1.png', //7
