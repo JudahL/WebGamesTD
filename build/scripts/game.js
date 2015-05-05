@@ -107,6 +107,7 @@ Node.prototype.manhattanDistance = function (xC, yC, xT, yT) {
         dy = Math.abs(yT - yC);
     return dx + dy;
 };
+//Based on the pathfinding solution created by Ash Blue (http://ashblue.github.io/javascript-pathfinding/)
 function AStarPathfinder () {
     this.map = null;
     this.closed = null;
@@ -299,8 +300,10 @@ function Enemy (x, y, z, frame) {
     
     this.target;
     
-    this.moveTimer;
+    this.moveTimer = game.time.create(false);
+    this.deathTimer = game.time.create(false);
     
+    //For pathfinding
     this.tilePos = {
         x: x/71.5,
         y: y/71.5
@@ -313,7 +316,18 @@ function Enemy (x, y, z, frame) {
         right: 'batteringRamRight.png'
     };
     
-    this.group
+    this.life = { //can't use 'health' as Phaser sprites already have a health property
+        current: 100,
+        max: 100
+    };
+    this.damage = 10;
+    this.goldValue = 10;
+    
+    this.group;
+    
+    this.tween;
+    
+    this.dead = false;
 }
 
 Enemy.prototype = Object.create(Phaser.Plugin.Isometric.IsoSprite.prototype);
@@ -327,9 +341,11 @@ Enemy.prototype.initiate = function (target, pfMap, group) {
     
     this.map.initiate(pfMap);
     this.pathfinder.initiate(this.map);
-   
-    this.group = group;
-    this.group.add(this);
+    
+    if (group) {
+        this.group = group;
+        this.group.add(this);
+    }
 };
 
 Enemy.prototype.setUp = function (){
@@ -337,13 +353,18 @@ Enemy.prototype.setUp = function (){
     
     this.currentStep = this.path.length - 1;
     
-    this.moveTimer = game.time.events.loop(Phaser.Timer.SECOND, this.move, this);
+    this.moveTimer.loop(Phaser.Timer.SECOND, this.move, this);
+    this.moveTimer.start();
 };
 
 Enemy.prototype.move = function () {
     this.currentStep--;
     
-    if (this.currentStep < 0) { return; }
+    if (this.currentStep < 0) { 
+        player.takeDamage(10);
+        this.suicide();
+        return; 
+    }
     
     this.currentNode = this.path[this.currentStep];
     
@@ -359,7 +380,7 @@ Enemy.prototype.updateWorldPos = function () {
     var isoX = this.tilePos.x*71.5;
     var isoY = this.tilePos.y*71.5;
     
-    game.add.tween(this).to({ isoX: isoX, isoY: isoY }, 1000, Phaser.Easing.Quadratic.InOut, true);
+    this.tween = game.add.tween(this).to({ isoX: isoX, isoY: isoY }, 1000, Phaser.Easing.Quadratic.InOut, true);
 };
 
 Enemy.prototype.changeFrame = function () {
@@ -374,13 +395,71 @@ Enemy.prototype.changeFrame = function () {
     }
 };
 
-Enemy.prototype.spawn = function (x, y) {
+Enemy.prototype.spawn = function (x, y, z, updateLife) {  
+    if (updateLife) { 
+        this.life.max = updateLife;
+    }
+    this.dead = false;
+    
+    this.body.allowGravity = false;
+    this.body.collideWorldBounds = false;
+    this.body.reset(0, 0, 0);
+    this.body.enable = false;
+    
+    this.isoX = x;
+    this.isoY = y;
+    this.isoZ = z;
+    
+    this.tilePos.x = this.isoX/71.5;
+    this.tilePos.y = this.isoY/71.5;
+    
     this.revive();
     
-    this.x = x;
-    this.y = y;
+    this.life.current = this.life.max;
     
     this.setUp();
+};
+
+Enemy.prototype.takeDamage = function (damage, dx, dy) {
+    if (this.dead) { return; }
+    this.life.current -= damage;
+    
+    if (this.life.current < 0) {
+        this.moveTimer.stop(true);
+        this.tween.stop();
+        this.isoZ = 90;
+        this.knockback(dx, dy);
+        this.dead = true;
+        player.addGold(this.goldValue);
+    }
+};
+
+Enemy.prototype.suicide = function () {
+    this.kill();
+    this.moveTimer.stop(true);
+    this.tween.stop();
+};
+
+Enemy.prototype.knockback = function (dx, dy) {
+    this.body.enable = true;
+    this.body.allowGravity = true;
+    this.body.gravity.setTo(0, 0, -700);
+    this.body.velocity.setTo(dx*5, dy*5, 300);
+    this.body.bounce.set(0.5, 0.5, 0.3);
+    this.body.maxVelocity.setTo(300, 300, 300);
+    this.body.deltaMax.setTo(20, 20, 20);
+    
+    this.deathTimer.add(Phaser.Timer.SECOND * 1, this.die, this);
+    this.deathTimer.start();
+};
+
+Enemy.prototype.die = function () {
+    this.deathTimer.stop();
+    this.kill();
+    this.body.allowGravity = false;
+    this.body.reset(0, 0, 0);
+    this.body.enable = false;
+    this.body.bounce.set(0, 0, 0);
 }
 function InfoBar (x, y, text, colour, value) {
     this.name = text;
@@ -449,7 +528,7 @@ stateManager.levelOne = new Level(game, 'Level One', 550,
         [ 0,10, 0, 0, 0, 0],
         [ 0, 0, 0, 0, 0, 0],
         [ 0, 0, 0, 0, 0, 0],
-        [10, 0, 0, 0, 0, 0],
+        [11, 0, 0, 0, 0, 0],
         [ 0, 0, 0, 0, 0,21],
         [ 0, 0, 0, 0, 0, 0]
     ]);
@@ -475,7 +554,7 @@ stateManager.levelTwo = new Level (game, 'Level Two', 600,
         [0, 0, 0, 0, 0, 1, 0]
     ],
     [
-        [0, 0, 0, 0, 0,10, 0],
+        [0, 0, 0, 0, 0,11, 0],
         [0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0],
         [23, 0, 0, 0, 0, 0,0],
@@ -504,6 +583,8 @@ function Level (game, title, titleY, tileM, pathM, towerM) {
     this.towerInfo;
     
     this.goldTimer;
+    
+    this.endTimer;
 };
 
 Level.prototype.create = function () { 
@@ -520,6 +601,7 @@ Level.prototype.create = function () {
     this.setUpInput();
     
     this.goldTimer = game.time.events.loop(Phaser.Timer.SECOND, this.grantGold, this);
+    this.endTimer = game.time.events.add(Phaser.Timer.SECOND*120, this.winLevel, this);
 };
 
     
@@ -576,9 +658,9 @@ Level.prototype.setUpTowerInfo = function () {
     this.towerInfo = new PlayerInfo (this.world.centerX+230, this.titleY, 'panel3.png');
     this.towerInfo.initiate();
     
-    this.towerInfo.add('Attack Speed', 'Blue', 60, -25);
-    this.towerInfo.add('Damage','Red', 80, 0);
-    this.towerInfo.add('Gold Cost', 'Yellow', 200, 25);
+    this.towerInfo.add('Attack Speed', 'Blue', 90, -25);
+    this.towerInfo.add('Damage','Red', 200, 0);
+    this.towerInfo.add('Gold Cost', 'Yellow', 100, 25);
 };
 
 Level.prototype.setUpInput = function () {
@@ -613,7 +695,16 @@ Level.prototype.returnToMenu = function () {
 
 Level.prototype.grantGold = function () {
     player.addGold(1);
-}
+};
+
+Level.prototype.levelEnd = function (state) {
+    player.setState(state);
+    this.returnToMenu();
+};
+
+Level.prototype.winLevel = function () {
+    this.levelEnd('win');
+};
 stateManager.loading = function (game) { 
     this.preloadBar = null;
     this.loadText = null;
@@ -647,6 +738,7 @@ stateManager.loading.prototype = {
         towerList.initiate();
         
         game.physics.startSystem(Phaser.Plugin.Isometric.ISOARCADE);
+        game.physics.isoArcade.setBounds(0, 0, 0, 500, 500, 1000);
         
         this.state.start('menu');
     },
@@ -664,6 +756,7 @@ stateManager.menu = function (game) {
     this.levelTitleBG = null;
     this.titleY = 96;
     this.levelUIY = 450;
+    this.stateText = null;
     this.map = null;
     this.tileMap = [
         [0, 0, 0, 0],
@@ -689,7 +782,7 @@ stateManager.menu.prototype = {
         
     },
 
-    create: function () {  
+    create: function () { 
         game.cursorPos = new Phaser.Plugin.Isometric.Point3();
         
         this.map = new TileMap(71.5, 0);
@@ -702,6 +795,11 @@ stateManager.menu.prototype = {
         game.input.addMoveCallback(this.checkTown, this);
         
         game.input.onDown.add(this.loadLevel, this);
+        
+        if (player.state != 'none'){
+            this.showStateText();
+        }
+        player.state = 'none';
     },
     
     setUpTitle: function () {
@@ -766,6 +864,24 @@ stateManager.menu.prototype = {
             default:
                 break;
         }
+    },
+    
+    showStateText: function () {
+        this.stateTextBG = this.add.sprite(this.world.centerX, this.world.centerY, 'menuAtlas', 'stateBg.png');
+        this.stateTextBG.anchor.set(0.5, 0.5);
+        
+        this.stateText = this.add.text(this.world.centerX, this.world.centerY, player.state, { 
+            font: "30px Neucha", 
+            fill: "#343434", 
+            align: "center" });
+        this.stateText.anchor.set(0.5, 0.5);
+        
+        game.time.events.add(Phaser.Timer.SECOND*5, this.stopStateText, this);
+    },
+    
+    stopStateText: function () {
+        this.stateTextBG.visible = false;
+        this.stateText.text = '';
     }
         
 };
@@ -777,16 +893,21 @@ var player = {
     
     gold: {
         max: 300,
-        current: 20
+        current: 50
     },
+    
+    state: 'none',
     
     reset: function (){
         this.health.current = this.health.max;
-        this.gold.current = 20;
+        this.gold.current = 50;
     },
     
     takeDamage: function (damage) {
         this.health.current -= damage;
+        if (this.health.current <= 0) {
+            game.state.getCurrentState().levelEnd('lose');
+        }
     },
     
     addGold: function (change) {
@@ -794,6 +915,23 @@ var player = {
         if (this.gold.current > this.gold.max) {
             this.gold.current = this.gold.max;
         } 
+    },
+    
+    spendGold: function (change) {
+        if (change > this.gold.current){
+            return false;
+        } else {
+            this.gold.current -= change;
+            return true;
+        }
+    },
+    
+    setState: function (condition) {
+        if (condition == 'win') {
+            this.state = 'Congradulations, you completed the level!';
+        }  else if (condition == 'lose') {
+            this.state = 'Sorry, your base was destroyed, try again!';
+        }
     }
 };
 
@@ -838,7 +976,60 @@ PlayerInfo.prototype.setValue = function (name, value) {
 }
 
 
-function Spawner (state, x, y, z, frequency) {
+function Projectile (x, y, z, frame) {
+    Phaser.Plugin.Isometric.IsoSprite.call(this, game, x, y, z, 'towerAtlas', frame);
+    
+    this.target;
+    this.damage = 0;
+};
+
+Projectile.prototype = Object.create(Phaser.Plugin.Isometric.IsoSprite.prototype);
+Projectile.prototype.constructor = Projectile;
+
+Projectile.prototype.initiate = function () {
+    this.kill();
+    
+    
+};
+
+Projectile.prototype.fire = function (x, y, damage, target) {    
+    this.isoX = x;
+    this.isoY = y;
+    this.isoZ = 100;
+    
+    this.revive();
+    
+    this.damage = damage;
+    this.target = target;
+};
+
+Projectile.prototype.update = function () {
+    if (!this.target) {return;}
+    
+    var dx = this.target.isoX - this.isoX;
+    var dy = this.target.isoY - this.isoY;
+    var dz = 0 - this.isoZ;
+    
+    if (Math.sqrt(dx*dx + dy*dy) < 20) {
+        this.kill();
+        this.target.takeDamage(this.damage, dx, dy);
+        this.target = null;
+        return;
+    }
+    
+    dx *= 0.04;
+    dy *= 0.04;
+    
+    this.isoX += dx;
+    this.isoY += dy;
+    this.isoZ += dz;
+    
+    
+};
+        
+        
+
+function Spawner (state, x, y, z, frequency, startingHealth, size) {
     this.state = state;
     
     this.target;
@@ -852,6 +1043,10 @@ function Spawner (state, x, y, z, frequency) {
     this.max = 10;
     
     this.tower = true;
+    
+    this.enemyHealth = startingHealth;
+    
+    this.size = size;
     
     this.enemyGroup = [];
 }
@@ -869,7 +1064,10 @@ Spawner.prototype.createEnemies = function () {
     for (i = 0; i < this.max; i++){
         enemy = new Enemy(this.x, this.y, this.z, 'batteringRamUp.png');
         enemy.initiate(this.target, this.state.pathfindingMap, this.state.map.tileGroup);
+        game.physics.isoArcade.enable(enemy);
+        enemy.isoZ *= this.size;
         enemy.anchor.set(0.5, -0.5);
+        enemy.scale.setTo(this.size, 1);
         enemy.kill();
         
         this.enemyGroup.push(enemy);
@@ -877,8 +1075,13 @@ Spawner.prototype.createEnemies = function () {
 };
 
 Spawner.prototype.spawn = function () {
+    this.enemyHealth *= 1.10;
+    
     var enemy = this.getEnemy();
-    if (enemy) { enemy.spawn(); }
+    if (enemy) { 
+        enemy.initiate(this.target, this.state.pathfindingMap); //Required to reset the pathfinder
+        enemy.spawn(this.x, this.y, this.z, this.enemyHealth); 
+    }
 };
 
 Spawner.prototype.getEnemy = function () {
@@ -891,7 +1094,7 @@ Spawner.prototype.getEnemy = function () {
 
 Spawner.prototype.addLiving = function (array) {
     for (i = 0; i < this.max; i++){
-        if (this.enemyGroup[i].alive){
+        if (this.enemyGroup[i].alive && !this.enemyGroup[i].dead){
             array.push(this.enemyGroup[i]);
         }
     }
@@ -964,6 +1167,7 @@ TileMap.prototype.initiate = function (map, oMap) {
         this.spawnTiles(this.objectMap, this.objectOffset, true);
         this.initiateSpawners();
         game.iso.simpleSort(this.tileGroup);
+        game.physics.isoArcade.setBounds(0, 0, 0, this.tileMap.length*71.5, this.tileMap.length*71.5, 1000);
     }
 };
 
@@ -998,8 +1202,20 @@ TileMap.prototype.spawnTiles = function (tm, z, object) {
                     tile.anchor.set(0.5, 0.5);
                 } else if (tileI >= 10 && tileI < 20){
                     //Create Spawner
-                    spawner = new Spawner(game.state.getCurrentState(), x, y, 53, 6);
-                    this.spawners.push(spawner);
+                    switch (tileI%10) {
+                        case 0:
+                            spawner = new Spawner(game.state.getCurrentState(), x, y, 53, 3, 50, 1);
+                            this.spawners.push(spawner);
+                            break;
+                        case 1:
+                            spawner = new Spawner(game.state.getCurrentState(), x, y, 53, 7, 150, 1.2);
+                            this.spawners.push(spawner);
+                            break;
+                            
+                        default:
+                            break;
+                    }
+                    
                 } else if (tileI >= 20 && tileI < 30) {
                     //Create Base
                     this.base = this.createBase (tileI, x, y);
@@ -1028,6 +1244,8 @@ TileMap.prototype.update = function () {
     if (this.place) { this.placeTower(tileTowers[towerList.currentIndex]); } 
     
     game.iso.simpleSort(this.tileGroup);
+    
+    this.tileGroup.forEach(this.updateTower, this, false);
 };
 
 TileMap.prototype.checkTileForCursor = function (tile) {
@@ -1097,15 +1315,18 @@ TileMap.prototype.tweenDownTower = function (tileT, tile){
 
 TileMap.prototype.placeTower = function (towerType) {
     if (this.currentTile.tile && !this.currentTile.tower && this.canPlace) {
-        var x = this.currentTile.tile.isoPosition.x;
-        var y = this.currentTile.tile.isoPosition.y;
-        var tower = new Tower(this, x, y, this.objectOffset+this.hoverOffset*2 , towerType);
-        this.tileGroup.add(tower);
-        tower.initiate();
-        tower.anchor.set(0.5, 0.5);
-        game.add.tween(tower).to({ isoZ: this.objectOffset+this.hoverOffset }, 200, Phaser.Easing.Quadratic.InOut, true);
-        this.currentTile.tower = tower;
-        this.place = false;
+        if (player.spendGold(towerList.get('cost'))) {
+            var x = this.currentTile.tile.isoPosition.x;
+            var y = this.currentTile.tile.isoPosition.y;
+            var tower = new Tower(this, x, y, this.objectOffset+this.hoverOffset*2 , towerType);
+            this.tileGroup.add(tower);
+            tower.initiate();
+            tower.anchor.set(0.5, 0.5);
+            game.add.tween(tower).to({ isoZ: this.objectOffset+this.hoverOffset }, 200, Phaser.Easing.Quadratic.InOut, true);
+            this.currentTile.tower = tower;
+            player.spendGold(towerList.get('cost'));
+            this.place = false;
+        }
     }
 };
 
@@ -1153,6 +1374,11 @@ TileMap.prototype.addLiving = function (array) {
     }
 };
 
+TileMap.prototype.updateTower = function (tile) {
+    if(tile.tower){
+        tile.update();
+    }
+};
 function Tower (tileMap, x, y, z, frame) {
     Phaser.Plugin.Isometric.IsoSprite.call(this, game, x, y, z, 'towerAtlas', frame);
     
@@ -1185,10 +1411,11 @@ Tower.prototype.initiate = function () {
     
     this.attackTimer = game.time.events.loop(Phaser.Timer.SECOND*(60/this.attackSpeed), this.fire, this);
     
-    this.projectile = game.add.isoSprite(this.isoX, this.isoY, this.isoZ, 'towerAtlas', 'buttonRound_blue.png', this.tileMap.tileGroup);
+    this.projectile = new Projectile(this.isoX, this.isoY, this.isoZ, 'buttonRound_blue.png');
+    this.tileMap.tileGroup.add(this.projectile);
     this.projectile.anchor.set(0.5, 0.5);
     this.projectile.scale.setTo(0.4, 0.4);
-    this.projectile.kill();
+    this.projectile.initiate();
 };
 
 Tower.prototype.fire = function () {
@@ -1198,11 +1425,8 @@ Tower.prototype.fire = function () {
     
     if (!target) { return; }
     
-    this.projectile.revive();
-    this.projectile.isoX = this.isoX;
-    this.projectile.isoY = this.isoY;
-    this.projectile.isoZ = this.isoZ;
-    game.add.tween(this.projectile).to({ isoX: target.isoX, isoY: target.isoY, isoZ:  0}, 100, Phaser.Easing.None, true);
+    this.projectile.fire(this.isoX, this.isoY, this.damage, target);
+    //game.add.tween(this.projectile).to({ isoX: target.isoX, isoY: target.isoY, isoZ:  0}, 100, Phaser.Easing.None, true);
 };
 
 Tower.prototype.getTargets = function () {
@@ -1229,14 +1453,20 @@ Tower.prototype.findTarget = function () {
         return null;
     }
 };
+
+Tower.prototype.update = function () {
+    if (this.projectile.alive) {
+        this.projectile.update();
+    }
+};
 var towerList = {
     currentIndex: 0,
     list: [],
     
     initiate: function () {
-        this.list.push(new TowerType('Archer Tower', 40, 60, 50, 'tower3.png'));
-        this.list.push(new TowerType('Mage Tower', 20, 45, 125, 'tower2.png'));
-        this.list.push(new TowerType('Cannon Tower', 80, 20, 200, 'tower1.png'));
+        this.list.push(new TowerType('Archer Tower', 70, 50, 50, 'tower3.png'));
+        this.list.push(new TowerType('Mage Tower', 50, 90, 75, 'tower2.png'));
+        this.list.push(new TowerType('Cannon Tower', 200, 35, 100, 'tower1.png'));
     },
 
     switchTower: function () {

@@ -12,8 +12,10 @@ function Enemy (x, y, z, frame) {
     
     this.target;
     
-    this.moveTimer;
+    this.moveTimer = game.time.create(false);
+    this.deathTimer = game.time.create(false);
     
+    //For pathfinding
     this.tilePos = {
         x: x/71.5,
         y: y/71.5
@@ -26,7 +28,18 @@ function Enemy (x, y, z, frame) {
         right: 'batteringRamRight.png'
     };
     
-    this.group
+    this.life = { //can't use 'health' as Phaser sprites already have a health property
+        current: 100,
+        max: 100
+    };
+    this.damage = 10;
+    this.goldValue = 10;
+    
+    this.group;
+    
+    this.tween;
+    
+    this.dead = false;
 }
 
 Enemy.prototype = Object.create(Phaser.Plugin.Isometric.IsoSprite.prototype);
@@ -40,9 +53,11 @@ Enemy.prototype.initiate = function (target, pfMap, group) {
     
     this.map.initiate(pfMap);
     this.pathfinder.initiate(this.map);
-   
-    this.group = group;
-    this.group.add(this);
+    
+    if (group) {
+        this.group = group;
+        this.group.add(this);
+    }
 };
 
 Enemy.prototype.setUp = function (){
@@ -50,13 +65,18 @@ Enemy.prototype.setUp = function (){
     
     this.currentStep = this.path.length - 1;
     
-    this.moveTimer = game.time.events.loop(Phaser.Timer.SECOND, this.move, this);
+    this.moveTimer.loop(Phaser.Timer.SECOND, this.move, this);
+    this.moveTimer.start();
 };
 
 Enemy.prototype.move = function () {
     this.currentStep--;
     
-    if (this.currentStep < 0) { return; }
+    if (this.currentStep < 0) { 
+        player.takeDamage(10);
+        this.suicide();
+        return; 
+    }
     
     this.currentNode = this.path[this.currentStep];
     
@@ -72,7 +92,7 @@ Enemy.prototype.updateWorldPos = function () {
     var isoX = this.tilePos.x*71.5;
     var isoY = this.tilePos.y*71.5;
     
-    game.add.tween(this).to({ isoX: isoX, isoY: isoY }, 1000, Phaser.Easing.Quadratic.InOut, true);
+    this.tween = game.add.tween(this).to({ isoX: isoX, isoY: isoY }, 1000, Phaser.Easing.Quadratic.InOut, true);
 };
 
 Enemy.prototype.changeFrame = function () {
@@ -87,11 +107,69 @@ Enemy.prototype.changeFrame = function () {
     }
 };
 
-Enemy.prototype.spawn = function (x, y) {
+Enemy.prototype.spawn = function (x, y, z, updateLife) {  
+    if (updateLife) { 
+        this.life.max = updateLife;
+    }
+    this.dead = false;
+    
+    this.body.allowGravity = false;
+    this.body.collideWorldBounds = false;
+    this.body.reset(0, 0, 0);
+    this.body.enable = false;
+    
+    this.isoX = x;
+    this.isoY = y;
+    this.isoZ = z;
+    
+    this.tilePos.x = this.isoX/71.5;
+    this.tilePos.y = this.isoY/71.5;
+    
     this.revive();
     
-    this.x = x;
-    this.y = y;
+    this.life.current = this.life.max;
     
     this.setUp();
+};
+
+Enemy.prototype.takeDamage = function (damage, dx, dy) {
+    if (this.dead) { return; }
+    this.life.current -= damage;
+    
+    if (this.life.current < 0) {
+        this.moveTimer.stop(true);
+        this.tween.stop();
+        this.isoZ = 90;
+        this.knockback(dx, dy);
+        this.dead = true;
+        player.addGold(this.goldValue);
+    }
+};
+
+Enemy.prototype.suicide = function () {
+    this.kill();
+    this.moveTimer.stop(true);
+    this.tween.stop();
+};
+
+Enemy.prototype.knockback = function (dx, dy) {
+    this.body.enable = true;
+    this.body.allowGravity = true;
+    this.body.gravity.setTo(0, 0, -700);
+    this.body.velocity.setTo(dx*5, dy*5, 300);
+    this.body.bounce.set(0.5, 0.5, 0.3);
+    this.body.maxVelocity.setTo(300, 300, 300);
+    this.body.deltaMax.setTo(20, 20, 20);
+    
+    this.deathTimer.add(Phaser.Timer.SECOND * 1, this.die, this);
+    this.deathTimer.start();
+};
+
+Enemy.prototype.die = function () {
+    this.deathTimer.stop();
+    this.kill();
+    this.body.allowGravity = false;
+    this.body.reset(0, 0, 0);
+    this.body.enable = false;
+    this.body.bounce.set(0, 0, 0);
 }

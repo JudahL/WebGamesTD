@@ -1,3 +1,4 @@
+//Based on the pathfinding solution created by Ash Blue (http://ashblue.github.io/javascript-pathfinding/)
 function AStarPathfinder () {
     this.map = null;
     this.closed = null;

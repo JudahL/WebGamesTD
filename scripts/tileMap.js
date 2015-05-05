@@ -28,6 +28,7 @@ TileMap.prototype.initiate = function (map, oMap) {
         this.spawnTiles(this.objectMap, this.objectOffset, true);
         this.initiateSpawners();
         game.iso.simpleSort(this.tileGroup);
+        game.physics.isoArcade.setBounds(0, 0, 0, this.tileMap.length*71.5, this.tileMap.length*71.5, 1000);
     }
 };
 
@@ -62,8 +63,20 @@ TileMap.prototype.spawnTiles = function (tm, z, object) {
                     tile.anchor.set(0.5, 0.5);
                 } else if (tileI >= 10 && tileI < 20){
                     //Create Spawner
-                    spawner = new Spawner(game.state.getCurrentState(), x, y, 53, 6);
-                    this.spawners.push(spawner);
+                    switch (tileI%10) {
+                        case 0:
+                            spawner = new Spawner(game.state.getCurrentState(), x, y, 53, 3, 50, 1);
+                            this.spawners.push(spawner);
+                            break;
+                        case 1:
+                            spawner = new Spawner(game.state.getCurrentState(), x, y, 53, 7, 150, 1.2);
+                            this.spawners.push(spawner);
+                            break;
+                            
+                        default:
+                            break;
+                    }
+                    
                 } else if (tileI >= 20 && tileI < 30) {
                     //Create Base
                     this.base = this.createBase (tileI, x, y);
@@ -92,6 +105,8 @@ TileMap.prototype.update = function () {
     if (this.place) { this.placeTower(tileTowers[towerList.currentIndex]); } 
     
     game.iso.simpleSort(this.tileGroup);
+    
+    this.tileGroup.forEach(this.updateTower, this, false);
 };
 
 TileMap.prototype.checkTileForCursor = function (tile) {
@@ -161,15 +176,18 @@ TileMap.prototype.tweenDownTower = function (tileT, tile){
 
 TileMap.prototype.placeTower = function (towerType) {
     if (this.currentTile.tile && !this.currentTile.tower && this.canPlace) {
-        var x = this.currentTile.tile.isoPosition.x;
-        var y = this.currentTile.tile.isoPosition.y;
-        var tower = new Tower(this, x, y, this.objectOffset+this.hoverOffset*2 , towerType);
-        this.tileGroup.add(tower);
-        tower.initiate();
-        tower.anchor.set(0.5, 0.5);
-        game.add.tween(tower).to({ isoZ: this.objectOffset+this.hoverOffset }, 200, Phaser.Easing.Quadratic.InOut, true);
-        this.currentTile.tower = tower;
-        this.place = false;
+        if (player.spendGold(towerList.get('cost'))) {
+            var x = this.currentTile.tile.isoPosition.x;
+            var y = this.currentTile.tile.isoPosition.y;
+            var tower = new Tower(this, x, y, this.objectOffset+this.hoverOffset*2 , towerType);
+            this.tileGroup.add(tower);
+            tower.initiate();
+            tower.anchor.set(0.5, 0.5);
+            game.add.tween(tower).to({ isoZ: this.objectOffset+this.hoverOffset }, 200, Phaser.Easing.Quadratic.InOut, true);
+            this.currentTile.tower = tower;
+            player.spendGold(towerList.get('cost'));
+            this.place = false;
+        }
     }
 };
 
@@ -214,5 +232,11 @@ TileMap.prototype.createBase = function (i, x, y) {
 TileMap.prototype.addLiving = function (array) {
     for (var i = 0; i < this.spawners.length; i++) {
         this.spawners[i].addLiving(array);
+    }
+};
+
+TileMap.prototype.updateTower = function (tile) {
+    if(tile.tower){
+        tile.update();
     }
 };

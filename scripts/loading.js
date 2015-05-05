@@ -31,6 +31,7 @@ stateManager.loading.prototype = {
         towerList.initiate();
         
         game.physics.startSystem(Phaser.Plugin.Isometric.ISOARCADE);
+        game.physics.isoArcade.setBounds(0, 0, 0, 500, 500, 1000);
         
         this.state.start('menu');
     },

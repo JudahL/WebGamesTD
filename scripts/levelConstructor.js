@@ -19,6 +19,8 @@ function Level (game, title, titleY, tileM, pathM, towerM) {
     this.towerInfo;
     
     this.goldTimer;
+    
+    this.endTimer;
 };
 
 Level.prototype.create = function () { 
@@ -35,6 +37,7 @@ Level.prototype.create = function () {
     this.setUpInput();
     
     this.goldTimer = game.time.events.loop(Phaser.Timer.SECOND, this.grantGold, this);
+    this.endTimer = game.time.events.add(Phaser.Timer.SECOND*120, this.winLevel, this);
 };
 
     
@@ -91,9 +94,9 @@ Level.prototype.setUpTowerInfo = function () {
     this.towerInfo = new PlayerInfo (this.world.centerX+230, this.titleY, 'panel3.png');
     this.towerInfo.initiate();
     
-    this.towerInfo.add('Attack Speed', 'Blue', 60, -25);
-    this.towerInfo.add('Damage','Red', 80, 0);
-    this.towerInfo.add('Gold Cost', 'Yellow', 200, 25);
+    this.towerInfo.add('Attack Speed', 'Blue', 90, -25);
+    this.towerInfo.add('Damage','Red', 200, 0);
+    this.towerInfo.add('Gold Cost', 'Yellow', 100, 25);
 };
 
 Level.prototype.setUpInput = function () {
@@ -128,4 +131,13 @@ Level.prototype.returnToMenu = function () {
 
 Level.prototype.grantGold = function () {
     player.addGold(1);
-}
+};
+
+Level.prototype.levelEnd = function (state) {
+    player.setState(state);
+    this.returnToMenu();
+};
+
+Level.prototype.winLevel = function () {
+    this.levelEnd('win');
+};

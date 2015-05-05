@@ -5,6 +5,7 @@ stateManager.menu = function (game) {
     this.levelTitleBG = null;
     this.titleY = 96;
     this.levelUIY = 450;
+    this.stateText = null;
     this.map = null;
     this.tileMap = [
         [0, 0, 0, 0],
@@ -30,7 +31,7 @@ stateManager.menu.prototype = {
         
     },
 
-    create: function () {  
+    create: function () { 
         game.cursorPos = new Phaser.Plugin.Isometric.Point3();
         
         this.map = new TileMap(71.5, 0);
@@ -43,6 +44,11 @@ stateManager.menu.prototype = {
         game.input.addMoveCallback(this.checkTown, this);
         
         game.input.onDown.add(this.loadLevel, this);
+        
+        if (player.state != 'none'){
+            this.showStateText();
+        }
+        player.state = 'none';
     },
     
     setUpTitle: function () {
@@ -107,6 +113,24 @@ stateManager.menu.prototype = {
             default:
                 break;
         }
+    },
+    
+    showStateText: function () {
+        this.stateTextBG = this.add.sprite(this.world.centerX, this.world.centerY, 'menuAtlas', 'stateBg.png');
+        this.stateTextBG.anchor.set(0.5, 0.5);
+        
+        this.stateText = this.add.text(this.world.centerX, this.world.centerY, player.state, { 
+            font: "30px Neucha", 
+            fill: "#343434", 
+            align: "center" });
+        this.stateText.anchor.set(0.5, 0.5);
+        
+        game.time.events.add(Phaser.Timer.SECOND*5, this.stopStateText, this);
+    },
+    
+    stopStateText: function () {
+        this.stateTextBG.visible = false;
+        this.stateText.text = '';
     }
         
 };

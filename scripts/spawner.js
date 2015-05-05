@@ -1,4 +1,4 @@
-function Spawner (state, x, y, z, frequency) {
+function Spawner (state, x, y, z, frequency, startingHealth, size) {
     this.state = state;
     
     this.target;
@@ -12,6 +12,10 @@ function Spawner (state, x, y, z, frequency) {
     this.max = 10;
     
     this.tower = true;
+    
+    this.enemyHealth = startingHealth;
+    
+    this.size = size;
     
     this.enemyGroup = [];
 }
@@ -29,7 +33,10 @@ Spawner.prototype.createEnemies = function () {
     for (i = 0; i < this.max; i++){
         enemy = new Enemy(this.x, this.y, this.z, 'batteringRamUp.png');
         enemy.initiate(this.target, this.state.pathfindingMap, this.state.map.tileGroup);
+        game.physics.isoArcade.enable(enemy);
+        enemy.isoZ *= this.size;
         enemy.anchor.set(0.5, -0.5);
+        enemy.scale.setTo(this.size, 1);
         enemy.kill();
         
         this.enemyGroup.push(enemy);
@@ -37,8 +44,13 @@ Spawner.prototype.createEnemies = function () {
 };
 
 Spawner.prototype.spawn = function () {
+    this.enemyHealth *= 1.10;
+    
     var enemy = this.getEnemy();
-    if (enemy) { enemy.spawn(); }
+    if (enemy) { 
+        enemy.initiate(this.target, this.state.pathfindingMap); //Required to reset the pathfinder
+        enemy.spawn(this.x, this.y, this.z, this.enemyHealth); 
+    }
 };
 
 Spawner.prototype.getEnemy = function () {
@@ -51,7 +63,7 @@ Spawner.prototype.getEnemy = function () {
 
 Spawner.prototype.addLiving = function (array) {
     for (i = 0; i < this.max; i++){
-        if (this.enemyGroup[i].alive){
+        if (this.enemyGroup[i].alive && !this.enemyGroup[i].dead){
             array.push(this.enemyGroup[i]);
         }
     }

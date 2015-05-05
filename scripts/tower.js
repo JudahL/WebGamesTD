@@ -30,10 +30,11 @@ Tower.prototype.initiate = function () {
     
     this.attackTimer = game.time.events.loop(Phaser.Timer.SECOND*(60/this.attackSpeed), this.fire, this);
     
-    this.projectile = game.add.isoSprite(this.isoX, this.isoY, this.isoZ, 'towerAtlas', 'buttonRound_blue.png', this.tileMap.tileGroup);
+    this.projectile = new Projectile(this.isoX, this.isoY, this.isoZ, 'buttonRound_blue.png');
+    this.tileMap.tileGroup.add(this.projectile);
     this.projectile.anchor.set(0.5, 0.5);
     this.projectile.scale.setTo(0.4, 0.4);
-    this.projectile.kill();
+    this.projectile.initiate();
 };
 
 Tower.prototype.fire = function () {
@@ -43,11 +44,8 @@ Tower.prototype.fire = function () {
     
     if (!target) { return; }
     
-    this.projectile.revive();
-    this.projectile.isoX = this.isoX;
-    this.projectile.isoY = this.isoY;
-    this.projectile.isoZ = this.isoZ;
-    game.add.tween(this.projectile).to({ isoX: target.isoX, isoY: target.isoY, isoZ:  0}, 100, Phaser.Easing.None, true);
+    this.projectile.fire(this.isoX, this.isoY, this.damage, target);
+    //game.add.tween(this.projectile).to({ isoX: target.isoX, isoY: target.isoY, isoZ:  0}, 100, Phaser.Easing.None, true);
 };
 
 Tower.prototype.getTargets = function () {
@@ -72,5 +70,11 @@ Tower.prototype.findTarget = function () {
         return this.targets[ii];
     } else {
         return null;
+    }
+};
+
+Tower.prototype.update = function () {
+    if (this.projectile.alive) {
+        this.projectile.update();
     }
 };
