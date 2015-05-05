@@ -16,6 +16,13 @@ var player = {
     
     takeDamage: function (damage) {
         this.health.current -= damage;
+    },
+    
+    addGold: function (change) {
+       this.gold.current += change;
+        if (this.gold.current > this.gold.max) {
+            this.gold.current = this.gold.max;
+        } 
     }
 };
 

@@ -30,6 +30,8 @@ stateManager.loading.prototype = {
     create: function () {
         towerList.initiate();
         
+        game.physics.startSystem(Phaser.Plugin.Isometric.ISOARCADE);
+        
         this.state.start('menu');
     },
 

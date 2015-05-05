@@ -1,9 +1,11 @@
 function TileMap (size) {
     this.tileMap = [];
-    this.towerMap = [];
+    this.objectMap = [];
     this.size = size || 71.5;
     this.tileGroup = game.add.group();
-    this.zz = 0;
+    
+    this.objectOffset = 4;
+    this.hoverOffset = 8;
     
     this.spawners = [];
     
@@ -19,11 +21,11 @@ function TileMap (size) {
     this.canPlace = true;
 }
 
-TileMap.prototype.initiate = function (map, tMap) {
-    this.setMap (map, tMap);
+TileMap.prototype.initiate = function (map, oMap) {
+    this.setMap (map, oMap);
     if (this.tileMap) {
-        this.spawnTiles(this.tileMap, this.zz, false);
-        this.spawnTiles(this.towerMap, 64, true);
+        this.spawnTiles(this.tileMap, 0, false);
+        this.spawnTiles(this.objectMap, this.objectOffset, true);
         this.initiateSpawners();
         game.iso.simpleSort(this.tileGroup);
     }
@@ -35,43 +37,51 @@ TileMap.prototype.initiateSpawners = function () {
     }
 };
 
-TileMap.prototype.spawnTiles = function (tm, zz, tower) {
+TileMap.prototype.spawnTiles = function (tm, z, object) {
     var tile, spawner, tileI;
     var m = tm[0].length;
-    for (var xx = 0; xx < this.size*m; xx += this.size) {
-        for (var yy = 0; yy < this.size*m; yy += this.size) {
-            tileI = tm[yy/this.size][xx/this.size];
-            if (tower == false) {
-                tile = game.add.isoSprite(xx, yy, zz, 'landAtlas', tileLandscapes[tileI], this.tileGroup);
-            } else {
-                if (tileI != 0 && tileI < 10) {
-                    tile = new Tower(game, xx, yy, zz, 'towerAtlas', tileTowers[tileI-1]);
-                    this.tileGroup.add(tile);
-                } else if (tileI != 0 && tileI >= 10 && tileI < 20){
-                    spawner = new Spawner(game.state.getCurrentState(), xx, yy, 53, 6);
-                    this.spawners.push(spawner);
-                } else if (tileI != 0 && tileI >= 20) {
-                    this.base = this.createBase (tileI, xx, yy);
-                    this.tileGroup.add(this.base);
-                }
-            }
-            if (tile && tower) {
-                tile.anchor.set(0.5, 0);
-            } else if (tile) {
+    for (var x = 0; x < this.size*m; x += this.size) {
+        for (var y = 0; y < this.size*m; y += this.size) {
+            tile = null;
+            tileI = tm[y/this.size][x/this.size];
+            
+            if (object == false) {
+                //Create Landscape
+                tile = game.add.isoSprite(x, y, z, 'landAtlas', tileLandscapes[tileI], this.tileGroup);
+                
                 var extension = tile.height % 99;
                 var anchorPosY = 0;
-                if (extension != 0) { 
-                    anchorPosY = extension/tile.height;
-                }
+                if (extension != 0) { anchorPosY = extension/tile.height; }
                 tile.anchor.set(0.5, anchorPosY);
+            } else if (tileI != 0){
+                if (tileI < 10) {
+                    //Create Tower
+                    tile = new Tower(this, x, y, z, towerList.get('frame'));
+                    this.tileGroup.add(tile);
+                    tile.initiate();
+                    tile.anchor.set(0.5, 0.5);
+                } else if (tileI >= 10 && tileI < 20){
+                    //Create Spawner
+                    spawner = new Spawner(game.state.getCurrentState(), x, y, 53, 6);
+                    this.spawners.push(spawner);
+                } else if (tileI >= 20 && tileI < 30) {
+                    //Create Base
+                    this.base = this.createBase (tileI, x, y);
+                    this.tileGroup.add(this.base);
+                } else if (tileI >= 30) {
+                    //Create City (Menu Only)
+                    tile = game.add.isoSprite(x, y, z, 'towerAtlas', tileCities[tileI%30], this.tileGroup);
+                    tile.anchor.set(0.5, 0.5);
+                    tile.tower = true;
+                }
             }
         }
     }
 };
 
-TileMap.prototype.setMap = function (map, tMap) {
+TileMap.prototype.setMap = function (map, oMap) {
     this.tileMap = map;
-    this.towerMap = tMap;
+    this.objectMap = oMap;
 };
 
 TileMap.prototype.update = function () {
@@ -85,7 +95,7 @@ TileMap.prototype.update = function () {
 };
 
 TileMap.prototype.checkTileForCursor = function (tile) {
-    if (tile.tower || tile.enemy) { return; }
+    if (tile.key != 'landAtlas') { return; }
     var inBounds = tile.isoBounds.containsXY(game.cursorPos.x, game.cursorPos.y);
     if (!tile.selected && inBounds) {
         this.selectTile(tile);
@@ -98,7 +108,7 @@ TileMap.prototype.selectTile = function (tile) {
     tile.selected = true;
     this.setCurrentTile(tile);
     
-    game.add.tween(tile).to({ isoZ: 8 }, 200, Phaser.Easing.Quadratic.InOut, true);
+    game.add.tween(tile).to({ isoZ: this.hoverOffset }, 200, Phaser.Easing.Quadratic.InOut, true);
     
     this.currentTile.tower = null;
     this.tileGroup.forEach(this.checkForTower, this, false, tile);
@@ -136,7 +146,7 @@ TileMap.prototype.checkForTower = function (tileT, tile){
     if (tileT.tower) {
         if (tileT.isoPosition.x == tile.isoPosition.x && tileT.isoPosition.y == tile.isoPosition.y){
             this.currentTile.tower = tileT;
-            game.add.tween(this.currentTile.tower).to({ isoZ: 72 }, 200, Phaser.Easing.Quadratic.InOut, true);
+            game.add.tween(this.currentTile.tower).to({ isoZ: this.objectOffset+this.hoverOffset }, 200, Phaser.Easing.Quadratic.InOut, true);
         }
     }
 };
@@ -144,19 +154,20 @@ TileMap.prototype.checkForTower = function (tileT, tile){
 TileMap.prototype.tweenDownTower = function (tileT, tile){
     if (tileT.tower) {
         if (tileT.isoPosition.x == tile.isoPosition.x && tileT.isoPosition.y == tile.isoPosition.y){
-            game.add.tween(tileT).to({ isoZ: 64 }, 200, Phaser.Easing.Quadratic.InOut, true);
+            game.add.tween(tileT).to({ isoZ: this.objectOffset }, 200, Phaser.Easing.Quadratic.InOut, true);
         }
     }
 };
 
 TileMap.prototype.placeTower = function (towerType) {
     if (this.currentTile.tile && !this.currentTile.tower && this.canPlace) {
-        var xx = this.currentTile.tile.isoPosition.x;
-        var yy = this.currentTile.tile.isoPosition.y;
-        var tower = new Tower(game, xx, yy, 64, 'towerAtlas', towerType);
+        var x = this.currentTile.tile.isoPosition.x;
+        var y = this.currentTile.tile.isoPosition.y;
+        var tower = new Tower(this, x, y, this.objectOffset+this.hoverOffset*2 , towerType);
         this.tileGroup.add(tower);
-        tower.anchor.set(0.5, 0);
-        game.add.tween(tower).to({ isoZ: 72 }, 200, Phaser.Easing.Quadratic.InOut, true);
+        tower.initiate();
+        tower.anchor.set(0.5, 0.5);
+        game.add.tween(tower).to({ isoZ: this.objectOffset+this.hoverOffset }, 200, Phaser.Easing.Quadratic.InOut, true);
         this.currentTile.tower = tower;
         this.place = false;
     }
@@ -198,4 +209,10 @@ TileMap.prototype.createBase = function (i, x, y) {
         tile.anchor.set(0.5, 0);
     }
     return tile;
+};
+
+TileMap.prototype.addLiving = function (array) {
+    for (var i = 0; i < this.spawners.length; i++) {
+        this.spawners[i].addLiving(array);
+    }
 };

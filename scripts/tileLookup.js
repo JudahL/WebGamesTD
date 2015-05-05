@@ -31,3 +31,8 @@ var tileTowers = ['tower3.png', //1
                   '', //6
                   'city1.png', //7
                   'city2.png'];//8
+
+var tileCities = [
+    'city1.png',
+    'city2.png'
+];

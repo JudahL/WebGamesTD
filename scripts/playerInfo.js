@@ -1,6 +1,8 @@
-function PlayerInfo (x, y) {
+function PlayerInfo (x, y, frame) {
     this.x = x;
     this.y = y;
+    
+    this.frame = frame;
     
     this.bg;
     
@@ -10,14 +12,15 @@ function PlayerInfo (x, y) {
 };
 
 PlayerInfo.prototype.initiate = function () {
-    this.bg = game.add.image(this.x, this.y, 'menuAtlas', 'healthPanel.png');
+    this.bg = game.add.image(this.x, this.y, 'menuAtlas', this.frame);
     this.bg.anchor.set(0.5, 0.5);
 };
 
-PlayerInfo.prototype.add = function (offset, text, colour, value) {
-    var info = new InfoBar(this.x, this.y, offset, text, colour, value);
+PlayerInfo.prototype.add = function (text, colour, value, offset) {
+    var info = new InfoBar(this.x, this.y, text, colour, value);
     this.bars.push(info);
-    info.createBar((this.bars.length-1)*this.offsetChunk);
+    var o = offset;
+    info.createBar(o);
 };
 
 PlayerInfo.prototype.update = function () {

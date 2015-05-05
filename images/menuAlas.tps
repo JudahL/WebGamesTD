@@ -195,6 +195,23 @@
             <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/arrowBrown_right.png</filename>
             <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/buttonSquare_beige_pressed.png</filename>
             <filename>D:/KenneyDonation_v31/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/buttonSquare_brown_pressed.png</filename>
+            <filename>healthPanel.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/barGreen_horizontalLeft.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/barGreen_horizontalMid.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/barGreen_horizontalRight.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/panel_beige.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/panel_blue.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/panelInset_beige.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/barYellow_horizontalLeft.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/barYellow_horizontalMid.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/barYellow_horizontalRight.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/barRed_horizontalLeft.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/barRed_horizontalMid.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/barRed_horizontalRight.png</filename>
+            <filename>panel3.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/barBlue_horizontalLeft.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/barBlue_horizontalRight.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/barBlue_horizontalMid.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

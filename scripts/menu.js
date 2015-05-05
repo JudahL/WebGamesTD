@@ -15,8 +15,8 @@ stateManager.menu = function (game) {
     this.towerMap = [
         [0, 0, 0, 0],
         [0, 0, 0, 0],
-        [0, 7, 0, 0],
-        [0, 0, 0, 8]
+        [0,30, 0, 0],
+        [0, 0, 0,31]
     ];
     this.town;
 };
@@ -35,7 +35,6 @@ stateManager.menu.prototype = {
         
         this.map = new TileMap(71.5, 0);
         this.map.initiate(this.tileMap, this.towerMap);
-        this.map.spawnTiles(this.map.towerMap, 64, true);
         
         this.setUpTitle();
         this.setUpLevelUI();

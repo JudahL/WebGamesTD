@@ -48,3 +48,11 @@ Spawner.prototype.getEnemy = function () {
         }
     }
 };
+
+Spawner.prototype.addLiving = function (array) {
+    for (i = 0; i < this.max; i++){
+        if (this.enemyGroup[i].alive){
+            array.push(this.enemyGroup[i]);
+        }
+    }
+};

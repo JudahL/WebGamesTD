@@ -80,19 +80,20 @@ Level.prototype.setUpTitle = function () {
 };
 
 Level.prototype.setUpInfo = function () {
-    this.info = new PlayerInfo (this.world.centerX-230, this.titleY);
+    this.info = new PlayerInfo (this.world.centerX-230, this.titleY, 'healthPanel.png');
     this.info.initiate();
 
-    this.info.add('Health','Green', player.health.max);
-    this.info.add('Gold', 'Yellow', player.gold.max); 
+    this.info.add('Health','Green', player.health.max, 0);
+    this.info.add('Gold', 'Yellow', player.gold.max, 25); 
 };
 
 Level.prototype.setUpTowerInfo = function () {
-    this.towerInfo = new PlayerInfo (this.world.centerX+230, this.titleY);
+    this.towerInfo = new PlayerInfo (this.world.centerX+230, this.titleY, 'panel3.png');
     this.towerInfo.initiate();
-
-    this.towerInfo.add('Damage','Red', 80);
-    this.towerInfo.add('Gold Cost', 'Yellow', 200);
+    
+    this.towerInfo.add('Attack Speed', 'Blue', 60, -25);
+    this.towerInfo.add('Damage','Red', 80, 0);
+    this.towerInfo.add('Gold Cost', 'Yellow', 200, 25);
 };
 
 Level.prototype.setUpInput = function () {
@@ -111,6 +112,7 @@ Level.prototype.update = function () {
     this.towerInfo.update();
     this.info.setValue('Health', player.health.current);
     this.info.setValue('Gold', player.gold.current);
+    this.towerInfo.setValue('Attack Speed', towerList.get('attackSpeed'));
     this.towerInfo.setValue('Damage', towerList.get('damage'));
     this.towerInfo.setValue('Gold Cost', towerList.get('cost'));
 };
@@ -125,8 +127,5 @@ Level.prototype.returnToMenu = function () {
 };        
 
 Level.prototype.grantGold = function () {
-    player.gold.current += 1;
-    if (player.gold.current > 100) {
-        player.gold.current = 100;
-    }
+    player.addGold(1);
 }

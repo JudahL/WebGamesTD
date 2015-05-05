@@ -193,7 +193,14 @@
             <filename>tower3.png</filename>
             <filename>tower2.png</filename>
             <filename>tower1.png</filename>
-            <filename>enemy1.png</filename>
+            <filename>base.png</filename>
+            <filename>base1.png</filename>
+            <filename>batteringRamDown.png</filename>
+            <filename>batteringRamLeft.png</filename>
+            <filename>batteringRamRight.png</filename>
+            <filename>batteringRamUp.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/iconCircle_blue.png</filename>
+            <filename>D:/kenneyDonation_v33/Art (14.494 files)/UI pack (300 assets)/Adventure pack (80 assets)/PNG/buttonRound_blue.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
